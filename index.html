@@ -297,6 +297,34 @@ nav img,.nvp img{width:26px;height:26px;border-radius:7px;object-fit:cover}
 #gate input{width:100%;max-width:320px;height:46px;border-radius:12px;border:1px solid #2d3a3d;background:#151b1d;color:#e8f0ef;padding:0 12px;direction:ltr;font-size:13px}
 #gate small{color:#93a7a6;font-size:12px;max-width:320px}#gate .er{color:#ff6b6b}
 </style>
+<style>/* تعديل: خلفية خانة المبلغ — أخضر خفيف للاستلام، أحمر خفيف للتحويل لعميل */
+.amg{background:rgba(76,212,138,.15)!important;border:1.5px solid rgba(76,212,138,.55)!important}
+.amr{background:rgba(255,107,107,.15)!important;border:1.5px solid rgba(255,107,107,.55)!important}
+input#am.amg,input#am.amr{border-radius:14px}
+</style>
+<style>/* تعديل: مربعي من/إلى (3 أشكال) في شاشتي الاستلام والتحويل لعميل */
+.qx .qsm{display:none!important}
+.qx>.qbox{height:96px!important}
+.qpf3{display:none;font-size:13px;font-weight:800;color:#6fd49a}.qpf3.neg{color:#f08a8a}.qx.qd3 .qpf3{display:block}
+.qft{display:flex;flex-direction:column;gap:6px;flex:none}
+.qfr{display:flex;align-items:stretch;gap:6px}
+.qfb{border-radius:14px;padding:6px;text-align:center;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.qfb.sm{flex:1}.qfb.lg{flex:2.3}
+.qfb em{font-size:11px;font-style:normal}
+.qfb b{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qfb .qfn{font-size:17px;font-weight:800}.qfb small{font-size:11px;color:var(--mu)}
+.qfb .si{font-size:14px}.qfb .si img{width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle}
+.qfb.r{border:1.5px solid #e0605f;background:rgba(224,96,95,.12)}.qfb.r em,.qfb.r .qfn{color:#f08a8a}
+.qfb.g{border:1.5px solid #4cc27f;background:rgba(76,194,127,.12)}.qfb.g em,.qfb.g .qfn{color:#6fd49a}
+.qfa{align-self:center;color:var(--mu);font-size:16px}
+.qpb{display:none;border-radius:12px;background:rgba(76,212,138,.15);color:#6fd49a;text-align:center;padding:6px;font-size:14px;font-weight:800}.qpb.neg{background:rgba(255,107,107,.15);color:#f08a8a}
+.qx.qd1 .qpb{display:block}
+.qmt{display:none;grid-template-columns:repeat(3,1fr);gap:6px}.qx.qd4 .qmt{display:grid}
+.qmt div{background:#11181b;border:1px solid #1d272b;border-radius:12px;padding:5px 2px;text-align:center;min-width:0}
+.qmt small{display:block;font-size:11px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qmt b{font-size:15px;font-weight:800}
+.qx.qd4 .qfn,.qx.qd4 .qfs{display:none}
+.qx>.qkp{height:208px!important;grid-auto-rows:46px!important}.qx .qkp span{height:46px!important}
+</style>
 </head>
 <body>
 <div id="gate"><div class="gl">📒</div><h1>دفتر الحسابات</h1><p>سجّل الدخول بحساب جوجل. بياناتك بتتحفظ على موبايلك وعلى جوجل درايف بتاعك فقط.</p>
@@ -344,11 +372,34 @@ function noH(a,big){if(!a.no)return '';return `<div class=no ${big?'style="font-
 function copyNo(n){const ok=()=>toast('✓ تم نسخ الرقم '+n),fb=()=>{const t=document.createElement('textarea');t.value=n;document.body.appendChild(t);t.select();try{document.execCommand('copy');ok()}catch(e){toast('تعذر النسخ')}t.remove()};try{navigator.clipboard.writeText(n).then(ok,fb)}catch(e){fb()}}
 const limCol=p=>{const mix=(a,b,t)=>'#'+[0,1,2].map(i=>Math.round(parseInt(a.substr(1+i*2,2),16)*(1-t)+parseInt(b.substr(1+i*2,2),16)*t).toString(16).padStart(2,'0')).join('');
  if(p<20)return '#2e9e5b';if(p<40)return mix('#2e9e5b','#c7c62f',(p-20)/20);if(p<60)return mix('#c7c62f','#f0c419',(p-40)/20);if(p<74.5)return mix('#f0c419','#e8602a',(p-60)/14.5);return '#d93a3a'};
+const remTx=(u,c)=>{const d=r2(c-u);return d<0?`تجاوز ${fmt(-d)}`:`متبقي ${fmt(d)}`};
 const limStripe=(p,c)=>p>100?`repeating-linear-gradient(135deg,${c} 0 6px,transparent 6px 10px)`:c;
 const limOver=a=>[[used(a,ymd()),a.dl],[used(a,ymd().slice(0,7)),a.ml]].some(r=>r[1]&&r[0]>r[1]);
 /* لون اللوجو لكل حساب */
 const LC={};
 function logoCol(src){return new Promise(res=>{if(LC[src]!==undefined)return res(LC[src]);const im=new Image();if(!/^data:/.test(src))im.crossOrigin='anonymous';im.onload=()=>{try{const n=40,c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');x.drawImage(im,0,0,n,n);const d=x.getImageData(0,0,n,n).data,B={};for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],al=d[i+3];if(al<200)continue;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),sat=mx?(mx-mn)/mx:0;if(sat<.35||mx<70)continue;let h;const df=mx-mn;h=mx==r?((g-b)/df+6)%6:mx==g?(b-r)/df+2:(r-g)/df+4;const k=Math.floor(h*2)%12,e=B[k]||(B[k]={w:0,r:0,g:0,b:0});const w=sat*mx;e.w+=w;e.r+=r*w;e.g+=g*w;e.b+=b*w}let best=null;for(const k in B)if(!best||B[k].w>best.w)best=B[k];if(!best)return res(LC[src]=null);let r=best.r/best.w,g=best.g/best.w,b=best.b/best.w;const m=Math.max(r,g,b);if(m<150){const f=150/m;r=Math.min(255,r*f);g=Math.min(255,g*f);b=Math.min(255,b*f)}res(LC[src]='#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join(''))}catch(e){res(LC[src]=null)}};im.onerror=()=>res(LC[src]=null);im.src=src})}
+/* تعديل: تلوين خانة المبلغ حسب نوع العملية */
+const _xfer1=xfer;xfer=function(k,f,t,pre){const r=_xfer1.apply(this,arguments);try{if(k=='r'||k=='s'){const am=$('am');if(am){const bx=am.closest('.qbox,.d3a')||am;bx.classList.add(k=='r'?'amg':'amr')}}}catch(e){}return r};
+/* تعديل: رقم سري لصفحة التقرير (بيتطلب كل مرة تدخلها) */
+const _render1=render;render=function(){if(V.tab=='rep'){if(!V._repOk&&S.pin){const back=(typeof _pt!='undefined'&&_pt&&_pt!='rep')?_pt:'home';V.tab=back;V.sub='';_render1.apply(this,arguments);askPin(()=>{V._repOk=1;V.tab='rep';V.sub='';render();scrollTo(0,0)});return}}else V._repOk=0;return _render1.apply(this,arguments)};
+/* تعديل: مربعي من/إلى — 3 أشكال مع تبديل (الشكل بيتحفظ في S.qd) */
+const QDL=[1,3,4],QDN={1:'صغير وكبير والربح تحتهم',3:'الربح جوه خانة المبلغ',4:'مربعين وتحتهم 3 خانات'};
+const qdCur=()=>QDL.includes(S.qd)?S.qd:1;
+function qdNext(){const i=QDL.indexOf(qdCur());S.qd=QDL[(i+1)%QDL.length];const x=document.querySelector('#sh .qx');if(x){QDL.forEach(d=>x.classList.remove('qd'+d));x.classList.add('qd'+S.qd)}save();toast('الشكل: '+QDN[S.qd])}
+function qFt(v,f,t,pf){const p=$('qft');if(!p||!f||!t)return;
+ const ok=v.M>0,ed=!!EID,nb=x=>`<bdi>${fmt(x)}</bdi>`,
+ box=(a,fr,amt,aft)=>{const sm=a.ty=='drawer';return `<div class=\"qfb ${fr?'r':'g'} ${sm?'sm':'lg'}\"><em>${fr?'من':'إلى'}</em><b>${sm?'':ico(a,1)+' '}${esc(a.name)}</b><span class=qfn dir=ltr>${ok?(fr?'−':'+')+fmt(amt):'—'}</span>${ed?'':`<small class=qfs>${sm?'رصيد '+nb(aft):nb(a.bal)+' ← '+nb(aft)}</small>`}</div>`},
+ pt=!ok?'':pf>0?'ربحك +'+fmt(pf):pf<0?'خسارتك −'+fmt(-pf):'بدون ربح',ng=ok&&pf<0,
+ nm=a=>a.ty=='drawer'?'الدرج':esc(a.name);
+ p.innerHTML=`<div class=qfr>${box(f,1,v.a,r2(f.bal-v.a))}<i class=qfa>←</i>${box(t,0,v.b,r2(t.bal+v.b))}</div><div class=\"qpb ${ng?'neg':''}\">${pt||'اكتب المبلغ لعرض الربح'}</div><div class=qmt><div><small>خارج من ${nm(f)}</small><b dir=ltr style=\"color:#f08a8a\">${ok?'−'+fmt(v.a):'—'}</b></div><div><small>داخل ${t.ty=='drawer'?'للدرج':'إلى '+esc(t.name)}</small><b dir=ltr style=\"color:#6fd49a\">${ok?'+'+fmt(v.b):'—'}</b></div><div><small>${pf<0?'الخسارة':'الربح'}</small><b dir=ltr style=\"color:${ng?'#f08a8a':'#6fd49a'}\">${ok?(pf<0?'−':'+')+fmt(Math.abs(pf)):'—'}</b></div></div>`;
+ const q3=$('qpf3');if(q3){q3.textContent=pt;q3.classList.toggle('neg',ng)}}
+function qdInit(){const x=document.querySelector('#sh .qx');if(!x||x.querySelector('#qft'))return;const bx=x.querySelector('.qbox');if(!bx)return;x.classList.add('qd'+qdCur());
+ const q3=document.createElement('small');q3.id='qpf3';q3.className='qpf3';bx.insertBefore(q3,bx.querySelector('#smr'));
+ const p=document.createElement('div');p.id='qft';p.className='qft';bx.after(p);
+ const g=x.querySelector('.qb .qg');if(g){const b=document.createElement('button');b.className='qg';b.id='qdb';b.setAttribute('aria-label','تبديل الشكل');b.textContent='🔀';b.onclick=qdNext;g.after(b)}
+ showSum();const pn=document.querySelector('#sh .pn');if(pn)pn.scrollTop=0}
+const _xferQ0=xferQ;xferQ=function(){const r=_xferQ0.apply(this,arguments);try{qdInit()}catch(e){}return r};
+const _qSum0=qSum;qSum=function(e,v,f,t,pf){const r=_qSum0.apply(this,arguments);try{qFt(v,f,t,pf)}catch(x){}return r};
 function gcPaint(){document.querySelectorAll('.gx[data-aid]').forEach(el=>{const a=A(+el.dataset.aid),im=a&&a.img;if(!im)return;logoCol(im).then(c=>{if(c)el.style.setProperty('--gc',c)})})}
 let _pt=null;const _render0=render;render=function(){_render0.apply(this,arguments);gcPaint();const t=V.tab;if(t=='exp'&&_pt!='exp'&&typeof expNew=='function'&&expSrcs().length)setTimeout(expNew,0);_pt=t};
 function cardV(a,v){if(v=='list')return card(a);const c=a.ty=='client',bl=`<div class=bal style="color:${!c&&a.bal<0?'#d93a3a':'var(--tx)'}">${fmt(c?-a.bal:a.bal)}${c?`<small>${a.bal>0?'دين عليه':a.bal<0?'دين عليا':''}</small>`:''}</div>`;
@@ -361,7 +412,7 @@ function cardV(a,v){if(v=='list')return card(a);const c=a.ty=='client',bl=`<div 
  else inn=`${hd}${kd}${tg}${bl}${lm}${tl}`;
  return `<div class="gc gx bp-${bp}${limWarn(a)?' lw':''}" data-aid="${a.id}" style="--gc:${col};border:1.5px ${a.ty=='wallet'||a.ty=='insta'?(limOver(a)?'dashed':'solid'):'solid'} var(--gc)" onclick="detail(${a.id})">${inn}</div>`}
 function gLim(a,col){const R=[['اليوم',used(a,ymd()),a.dl],['الشهر',used(a,ymd().slice(0,7)),a.ml]].filter(r=>r[2]);if(!R.length)return '';const rg=S.gls=='rings',pc=r=>Math.round(r[1]/r[2]*100),cl=p=>limCol(p);
- return rg?`<div class=glr>${R.map(r=>{const p=pc(r),q=Math.min(100,p);return `<div class=glw><div class=gring style="background:conic-gradient(${cl(p)} ${q}%,#ffffff1f 0)"><span>${p}%</span></div><small>${r[0]}</small><small>${fmt(r[1])}</small><small>من ${fmt(r[2])}</small></div>`}).join('')}</div>`:`<div class=glb>${R.map(r=>{const p=pc(r);return `<div><div class=glt><span>${r[0]}</span><span>${p}%</span></div><div class=glx><i style="width:${Math.min(100,p)}%;background:${limStripe(p,cl(p))}"></i></div><small>${fmt(r[1])} / ${fmt(r[2])}</small></div>`}).join('')}</div>`}
+ return rg?`<div class=glr>${R.map(r=>{const p=pc(r),q=Math.min(100,p);return `<div class=glw><div class=gring style="background:conic-gradient(${cl(p)} ${q}%,#ffffff1f 0)"><span>${p}%</span></div><small>${r[0]}</small><small>${r[2]-r[1]<0?'تجاوز':'متبقي'}</small><small>${fmt(Math.abs(r2(r[2]-r[1])))}</small></div>`}).join('')}</div>`:`<div class=glb>${R.map(r=>{const p=pc(r);return `<div><div class=glt><span>${r[0]}</span><span>${p}%</span></div><div class=glx><i style="width:${Math.min(100,p)}%;background:${limStripe(p,cl(p))}"></i></div><small>${remTx(r[1],r[2])}</small></div>`}).join('')}</div>`}
 const vwGet=T=>(V.tv&&V.tv[T])||(S.vw&&S.vw[T])||{v:T=='machine'||T=='client'?'grid':'list',o:'auto'};
 function ordAcc(l,o){const la=lastAct(),bv=a=>a.ty=='client'?Math.abs(a.bal):a.bal;if(o=='new')return l.slice().sort((x,y)=>(la[y.id]||'').localeCompare(la[x.id]||'')||bv(y)-bv(x));if(o=='bal')return l.slice().sort((x,y)=>bv(y)-bv(x));if(o=='low')return l.slice().sort((x,y)=>bv(x)-bv(y));if(o=='name')return l.slice().sort((x,y)=>x.name.localeCompare(y.name,'ar'));return srtAcc(l)}
 function vwOpt(T){const w=vwGet(T),VS=[['grid','▦ شبكة'],['circle','◯ دائري'],['list','☰ أفقي (قائمة)']],BP=[['cur','الحالي'],['band','شريط الرصيد'],['top','الرصيد في الأعلى'],['foot','شريط سفلي ملوّن'],['color','رصيد ملوّن تحت الاسم']],OS=[['auto','تلقائي (الأحدث ثم الأعلى رصيدًا)'],['new','الأحدث معاملات'],['bal','الأعلى رصيدًا'],['low','الأقل رصيدًا'],['name','أبجدي']],op=(L,c)=>L.map(o=>`<option value=${o[0]} ${c==o[0]?'selected':''}>${o[1]}</option>`).join('');
@@ -404,7 +455,7 @@ const used=(w,pre)=>{let u=S.tx.filter(x=>x.t==w.id&&x.k!='adj'&&x.d.startsWith(
 const left=a=>a.nv?999:90-Math.floor((Date.now()-new Date(a.call||ymd()).getTime())/864e5);
 const valCol=p=>{const mix=(a,b,t)=>'#'+[0,1,2].map(i=>Math.round(parseInt(a.substr(1+i*2,2),16)*(1-t)+parseInt(b.substr(1+i*2,2),16)*t).toString(16).padStart(2,'0')).join('');if(p<20)return '#2e9e5b';if(p<40)return mix('#2e9e5b','#c7c62f',(p-20)/20);if(p<60)return mix('#c7c62f','#f0c419',(p-40)/20);if(p<74.5)return mix('#f0c419','#e8602a',(p-60)/14.5);return '#d93a3a'};
 function valTgl(id){const a=A(id);if(!a)return;a.nv=!a.nv;if(!a.nv&&!a.call)a.call=ymd();pushLog((a.nv?'⏸️ إيقاف صلاحية الخط: ':'▶️ تفعيل صلاحية الخط (3 شهور): ')+a.name);render();toast(a.nv?'تم إيقاف تتبع الصلاحية':'✓ تم تفعيل تتبع الصلاحية 3 شهور')}
-function limBar(w){const row=(l,u,c)=>c?`<div class=lim><div class=lt><span>${l}</span><span>مستهلك ${fmt(u)} من ${fmt(c)} (${Math.round(u/c*100)}%)</span></div><div class=bar><i style="width:${Math.min(100,u/c*100)}%;background:${limStripe(u/c*100,limCol(u/c*100))}"></i></div></div>`:'';
+function limBar(w){const row=(l,u,c)=>c?`<div class=lim><div class=lt><span>${l}</span><span>${remTx(u,c)} (${Math.round(u/c*100)}% مستهلك)</span></div><div class=bar><i style="width:${Math.min(100,u/c*100)}%;background:${limStripe(u/c*100,limCol(u/c*100))}"></i></div></div>`:'';
  return row('اليوم',used(w,ymd()),w.dl)+row('الشهر',used(w,ymd().slice(0,7)),w.ml)}
 function addTx(o){const pb={};[o.f,o.t].forEach(i=>{if(i&&A(i))pb[i]=A(i).bal});o.id=S.seq++;o.ts=o.ts||Date.now();o.d=o.d||ymd();o.a=o.a||0;o.b=o.b||0;o.p=o.p||0;if(o.f&&A(o.f))o.fb=r2(A(o.f).bal);if(o.t&&A(o.t))o.tb=r2(A(o.t).bal);S.tx.unshift(o);if(o.k!='set'){[o.f,o.t].forEach(i=>{if(i&&A(i))delete A(i).sv})}
  if(o.f)A(o.f).bal-=o.a;if(o.t)A(o.t).bal+=o.b;if(o.f&&A(o.f))o.fa=r2(A(o.f).bal);if(o.t&&A(o.t))o.ta=r2(A(o.t).bal);
