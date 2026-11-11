@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>/* تابلت: تكبير الواجهة بنفس تصميم الموبايل */
+(function(){var m=document.querySelector('meta[name=viewport]'),mq=window.matchMedia('(orientation:landscape)');function f(){var sw=Math.min(screen.width,screen.height);m.content=sw>=600?'width='+(mq.matches?900:540)+',initial-scale=1,viewport-fit=cover':'width=device-width,initial-scale=1,viewport-fit=cover'}f();if(mq.addEventListener)mq.addEventListener('change',f);window.addEventListener('orientationchange',function(){setTimeout(f,150)})})();
+</script>
 <meta name="theme-color" content="#0b0f10"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <title>دفتر الحسابات</title>
 <style>
@@ -1419,7 +1422,7 @@ async function gVers(){try{await gTok(true);const f=(await API.list()).filter(x=
  sheet('🕘 النسخ على الدرايف',f.map(x=>`<div class=tx><div class=r1><span>${x.name=='ledger.json'?'النسخة الحالية':'نسخة '+x.name.slice(2,-5)}</span><small>${new Date(x.modifiedTime).toLocaleString('ar-EG')}</small></div>${x.name!='ledger.json'?`<div class=acts><small style="color:var(--p)" onclick="gRestore('${x.id}')">♻️ استعادة</small></div>`:''}</div>`).join('')||'<div class=empty>لا توجد نسخ</div>')}catch(e){toast('تعذر التحميل: '+(e.message||e).toString().slice(0,60))}}
 function gRestore(id){askPin(async()=>{if(!confirm('استعادة هذه النسخة مكان البيانات الحالية؟ (هتتحفظ نسخة محلية قبلها)'))return;try{await gTok(true);const d=JSON.parse(await API.get(id));if(!d.acc)throw new Error('ملف غير صالح');localStorage.setItem('db_prev',JSON.stringify(S));S=d;S.set=Object.assign({cr:1.5,cs:1,ci:1},S.set||{});LASTJ='';save();S.upd=Date.now();save();render();closeSh();toast('✓ تمت الاستعادة');gSync(true)}catch(e){toast('تعذرت الاستعادة: '+(e.message||e).toString().slice(0,60))}})}
 function cloudUI(){const ok=location.protocol=='https:'||location.hostname=='localhost',c=GD.cfg,st={off:'غير متصل',ok:'متزامن ✓',sync:'جاري المزامنة...',auth:'محتاج تأكيد (اضغط أي مكان)',err:'تعذرت المزامنة / لا يوجد نت'}[GST];
- sheet('☁️ جوجل درايف · إصدار 4',(ok?'':'<div class=alert>⚠️ تسجيل الدخول بجوجل لا يعمل إلا لو التطبيق مفتوح من رابط https (بعد رفعه على الاستضافة). الآن مفتوح كملف.</div>')+
+ sheet('☁️ جوجل درايف · إصدار 5',(ok?'':'<div class=alert>⚠️ تسجيل الدخول بجوجل لا يعمل إلا لو التطبيق مفتوح من رابط https (بعد رفعه على الاستضافة). الآن مفتوح كملف.</div>')+
  `<p style="color:var(--mu);font-size:13px">بيحفظ نسخة تلقائيًا بعد كل تعديل في مجلد مخفي خاص بالتطبيق على درايفك، وبيحتفظ بآخر 5 نسخ.</p>
  <label>Google Client ID</label><input id=gcid value="${c.cid||''}" placeholder="xxxx.apps.googleusercontent.com" style="direction:ltr">
  ${c.conn?`<p>الحالة: <b>${st}</b>${c.last?'<br><small>آخر مزامنة: '+new Date(c.last).toLocaleString('ar-EG')+'</small>':''}</p><button class=btn onclick="askPin(()=>gSync(true))">🔄 مزامنة الآن</button><button class="btn g" onclick="askPin(()=>gVers())">🕘 النسخ السابقة / استعادة</button><button class="btn g" onclick="gSetCid()">💾 حفظ الـ Client ID</button><button class="btn d" onclick="gDisc()">⏏️ إلغاء الربط</button>`:`<button class=btn onclick="gConnect()">🔗 تسجيل الدخول بحساب جوجل</button>`}`)}
