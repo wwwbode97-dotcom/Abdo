@@ -357,6 +357,29 @@ table.sdt{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
 <div id="cp"></div>
 <input type="file" id="fi" accept=".json" hidden onchange="imp(event)">
 <script>
+/* تعديل: فاصل الآلاف (,) تلقائي في كل خانات المبالغ — القيمة اللي بيقراها البرنامج بتفضل رقم عادي من غير فواصل */
+(function(){
+ const D=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'),AD='٠١٢٣٤٥٦٧٨٩';
+ const norm=v=>String(v).replace(/[٠-٩]/g,d=>AD.indexOf(d)).replace(/٫/g,'.').replace(/[^\d.\-]/g,'');
+ const fm=v=>{v=norm(v);const neg=v[0]=='-';v=v.replace(/-/g,'');const i=v.indexOf('.');let a=i<0?v:v.slice(0,i),b=i<0?'':'.'+v.slice(i+1).replace(/\./g,'');
+  a=a.replace(/^0+(?=\d)/,'');if(!a&&b)a='0';return (neg?'-':'')+a.replace(/\B(?=(\d{3})+(?!\d))/g,',')+b};
+ const on=el=>el.dataset&&el.dataset.th=='1';
+ Object.defineProperty(HTMLInputElement.prototype,'value',{configurable:true,enumerable:D.enumerable,
+  get(){const v=D.get.call(this);return on(this)?String(v).replace(/,/g,''):v},
+  set(v){D.set.call(this,on(this)&&v!==''&&v!=null?fm(v):v)}});
+ function prep(el){if(el.dataset.th=='1')return;if(!(el.type=='number'||el.classList.contains('qam')))return;
+  const cur=D.get.call(el);el.dataset.th='1';if(el.type=='number')el.type='text';el.inputMode=el.readOnly?'none':'decimal';el.setAttribute('autocomplete','off');
+  if(cur!=='')D.set.call(el,fm(cur))}
+ function scan(r){if(!r||!r.querySelectorAll)return;if(r.matches&&r.matches('input'))prep(r);r.querySelectorAll('input[type=number],input.qam').forEach(prep)}
+ new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(scan))).observe(document.documentElement,{childList:true,subtree:true});
+ scan(document);
+ document.addEventListener('input',e=>{const el=e.target;if(!el||el.tagName!='INPUT'||!on(el)||el.readOnly)return;
+  const raw=D.get.call(el),pos=el.selectionStart==null?raw.length:el.selectionStart,cnt=norm(raw.slice(0,pos)).length,nv=fm(raw);
+  if(nv===raw)return;D.set.call(el,nv);let p=0,c=0;while(p<nv.length&&c<cnt){if(/[\d.\-]/.test(nv[p]))c++;p++}
+  try{el.setSelectionRange(p,p)}catch(_){}},true);
+})();
+</script>
+<script>
 const TY={drawer:{n:'الدرج',i:'💵',c:'#2e7d32'},wallet:{n:'المحافظ',i:'👛',c:'#7b4bd6'},insta:{n:'انستا',i:'💳',c:'#d6336c'},machine:{n:'المكن',i:'🏧',c:'#e8870e'},client:{n:'الموردين',i:'🏭',c:'#1f78c8'}};
 const SEC={cash:'مكسب الكاش',machine:'مكسب المكن',acc:'مكسب الاكسسوار'};
 
@@ -449,7 +472,8 @@ function supAgg(id,inP,isAft){
  ['m','pf','net'].forEach(k=>{o[k]=r2(o[k]);i[k]=r2(i[k])});
  return{prev,close,o,i,oth:r2(oth),pf:r2(o.pf+i.pf),n:o.n+i.n}}
 function supHead(v){return fmt(Math.abs(v))+' ج <small style="font-size:13px;font-weight:400">'+(v>0.004?'عليه — هتاخد منه':v<-0.004?'له — هتدفع له':'متسدد ✓')+'</small>'}
-const sdSup=()=>S.ss==2?2:1;
+const SSOPT=[[1,'١ — صفوف (استلام / سابق / تحويل)'],[2,'٢ — مربعين + سطر للسابق'],[3,'٣ — المتبقي في الأول'],[4,'٤ — خط رأسي بنقط ملونة'],[5,'٥ — صفوف بشريط ملون على الجنب'],[6,'٦ — عمودين ملونين (استلام يمين / تحويل شمال)'],[7,'٧ — عمودين خفيفين (خط ملون فوق)']];
+const sdSup=()=>SSOPT.some(o=>o[0]==S.ss)?+S.ss:1;
 function supSumHtml(s,id){
  const m=sdSup(),Z=.004,G='#4cd48a',R='#ff6b6b',O=s.o,I=s.i,P=s.prev,F=s.close,AS=r2(P-I.net),
  WV=v=>v>Z?'عليه '+fmt(v):v<-Z?'له '+fmt(-v):'متسدد ✓',
@@ -457,25 +481,41 @@ function supSumHtml(s,id){
  pn=x=>x>0?'ربح '+fmt(x):x<0?'خسارة '+fmt(-x):'بدون ربح أو خسارة',
  bg=c=>c==G?'rgba(76,212,138,.14)':c==R?'rgba(255,107,107,.14)':'var(--cd2)',
  bd=c=>c==G?'rgba(76,212,138,.4)':c==R?'rgba(255,107,107,.4)':'var(--ln)',
- big=(v,c)=>`<span style="font-size:${m==2?26:24}px;font-weight:800;direction:ltr;color:${c||'var(--tx)'}">${v}</span>`,
- sub=(t,c)=>`<div style="font-size:12px;color:${c||'var(--mu)'}">${t}</div>`,
- rcv=I.n?{l:'استلمت منه',n:fmt(I.m),s1:pn(I.pf),s2:'له '+fmt(I.net)}:null,
- trn=O.n?{l:'حوّلت له',n:fmt(O.m),s1:pn(O.pf),s2:'عليه '+fmt(O.net)}:null,
- pv=`<small style="color:var(--mu)">${I.n&&Math.abs(P)>Z?'بعد التسوية: '+WV(AS):''}</small>`,
- oth=Math.abs(s.oth)>.5?`<div class=rw><small>تعديلات / تسويات رصيد</small><b dir=ltr>${s.oth>0?'+':'−'}${fmt(Math.abs(s.oth))}</b></div>`:'',
- fin=m==2?`<div style="background:var(--cd2);border:1px solid var(--ln);border-radius:14px;padding:12px;text-align:center;margin-top:8px"><div style="font-size:13px;color:var(--mu)">المتبقي</div><div style="font-size:30px;font-weight:800;direction:ltr">${fmt(Math.abs(F))} <small style="font-size:14px;font-weight:400;color:var(--mu)">${W(F)}</small></div></div>`
-  :`<div style="border-top:1.5px solid var(--ln);margin-top:8px;padding:10px 4px 2px;display:flex;justify-content:space-between;align-items:center"><b>المتبقي</b><span style="font-size:26px;font-weight:800;direction:ltr">${fmt(Math.abs(F))} <small style="font-size:13px;font-weight:400;color:var(--mu)">${W(F)}</small></span></div>`;
+ mu='var(--mu)',
+ rcv=I.n?{l:'استلمت منه',n:fmt(I.m),s1:pn(I.pf),s2:'له '+fmt(I.net),c:G}:null,
+ trn=O.n?{l:'حوّلت له',n:fmt(O.m),s1:pn(O.pf),s2:'عليه '+fmt(O.net),c:R}:null,
+ psub=I.n&&Math.abs(P)>Z?'بعد التسوية: '+WV(AS):'',
+ pbig=fmt(Math.abs(P))+' <small style="font-size:12px;font-weight:400;color:'+mu+'">'+W(P)+'</small>',
+ fbig=(sz)=>`<span style="font-size:${sz}px;font-weight:800;direction:ltr">${fmt(Math.abs(F))} <small style="font-size:13px;font-weight:400;color:${mu}">${W(F)}</small></span>`,
+ oth=Math.abs(s.oth)>.5?`<div style="padding:2px 4px;margin-top:6px"><div class=rw><small>تعديلات / تسويات رصيد</small><b dir=ltr>${s.oth>0?'+':'−'}${fmt(Math.abs(s.oth))}</b></div></div>`:'',
+ items=[].concat(rcv?[{l:rcv.l,big:rcv.n,sub:rcv.s1+' ← '+rcv.s2,c:rcv.c}]:[],[{l:'رصيد سابق',big:pbig,sub:psub,c:''}],trn?[{l:trn.l,big:trn.n,sub:trn.s1+' ← '+trn.s2,c:trn.c}]:[]),
+ sub=(t,c)=>t?`<div style="font-size:12px;color:${c||mu}">${t}</div>`:'',
+ bigs=(v,c,sz)=>`<span style="font-size:${sz||24}px;font-weight:800;direction:ltr;color:${c||'var(--tx)'}">${v}</span>`,
+ finLine=`<div style="border-top:1.5px solid var(--ln);margin-top:8px;padding:10px 4px 2px;display:flex;justify-content:space-between;align-items:center"><b>المتبقي</b>${fbig(26)}</div>`,
+ finBox=`<div style="background:var(--cd2);border:1px solid var(--ln);border-radius:14px;padding:10px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b>المتبقي</b>${fbig(28)}</div>`,
+ finHero=`<div style="background:var(--cd2);border:1px solid var(--ln);border-radius:14px;padding:14px;text-align:center"><div style="font-size:13px;color:${mu}">المتبقي</div><div style="font-size:34px;font-weight:800;direction:ltr">${fmt(Math.abs(F))} <small style="font-size:14px;font-weight:400;color:${mu}">${W(F)}</small></div></div>`,
+ cols=(light)=>{const bx=o=>light
+   ?`<div style="background:var(--cd2);border:1px solid var(--ln);border-top:3px solid ${o.c};border-radius:0 0 12px 12px;padding:10px 8px;text-align:center"><div style="font-size:13px;color:${mu}">${o.l}</div><div style="font-size:26px;font-weight:800;direction:ltr;color:${o.c};margin:2px 0">${o.n}</div><div style="font-size:12px;color:${mu}">${o.s1}</div><div style="font-size:12px;color:${o.c}">${o.s2}</div></div>`
+   :`<div style="background:${bg(o.c)};border:1px solid ${bd(o.c)};border-radius:12px;padding:12px 8px;text-align:center"><div style="font-size:13px;color:${o.c}">${o.l}</div><div style="font-size:26px;font-weight:800;direction:ltr;color:${o.c};margin:2px 0">${o.n}</div><div style="font-size:12px;color:${o.c}">${o.s1}</div><div style="font-size:12px;color:${o.c}">${o.s2}</div></div>`;
+  return `<div style="display:grid;grid-template-columns:repeat(${rcv&&trn?2:1},minmax(0,1fr));gap:8px;margin-top:8px">${rcv?bx(rcv):''}${trn?bx(trn):''}</div>`},
+ prevLine=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 4px 4px"><div><div style="font-weight:700">رصيد سابق</div>${sub(psub)}</div>${bigs(pbig,'',20)}</div>`,
+ prevCard=`<div style="background:var(--cd2);border:1px solid var(--ln);border-radius:12px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px"><div><div style="font-weight:700">رصيد سابق</div>${sub(psub)}</div>${bigs(pbig,'',20)}</div>`;
  let h='';
- if(m==2){
-  const bx=(o,c)=>`<div style="background:${bg(c)};border:1px solid ${bd(c)};border-radius:12px;padding:12px;text-align:center"><div style="font-size:13px;color:${c}">${o.l}</div><div style="font-size:26px;font-weight:800;direction:ltr;color:${c}">${o.n}</div><div style="font-size:12px;color:${c}">${o.s1}</div><div style="font-size:12px;color:${c}">${o.s2}</div></div>`;
-  h=`<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px">${rcv?bx(rcv,G):''}${trn?bx(trn,R):''}</div>`
-  +`<div style="display:flex;justify-content:space-between;gap:8px;padding:12px 4px 4px;font-size:14px;flex-wrap:wrap"><span style="color:var(--mu)">رصيد سابق: ${WV(P)}</span>${I.n&&Math.abs(P)>Z?`<span>بعد التسوية: ${WV(AS)}</span>`:''}</div>`}
- else{
-  const rw=(o,c)=>`<div style="background:${bg(c)};border:1px solid ${bd(c)};border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px"><div><div style="font-weight:700;color:${c}">${o.l}</div>${sub(o.s1+' ← '+o.s2,c)}</div>${big(o.n,c)}</div>`;
-  h=(rcv?rw(rcv,G):'')
-  +`<div style="background:${bg()};border:1px solid ${bd()};border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px"><div><div style="font-weight:700">رصيد سابق</div>${I.n&&Math.abs(P)>Z?sub('بعد التسوية: '+WV(AS)):''}</div>${big(fmt(Math.abs(P))+' <small style="font-size:12px;font-weight:400;color:var(--mu)">'+W(P)+'</small>')}</div>`
-  +(trn?rw(trn,R):'')}
- return h+(oth?`<div style="padding:2px 4px;margin-top:6px">${oth}</div>`:'')+fin}
+ if(m==1||m==5){
+  h=items.map(o=>m==1
+   ?`<div style="background:${bg(o.c)};border:1px solid ${bd(o.c)};border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px"><div><div style="font-weight:700;color:${o.c||'var(--tx)'}">${o.l}</div>${sub(o.sub,o.c||mu)}</div>${bigs(o.big,o.c)}</div>`
+   :`<div style="border-right:4px solid ${o.c||'var(--ln)'};padding:2px 12px 2px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px"><div><div style="font-size:13px;color:${mu}">${o.l}</div>${sub(o.sub,o.c||mu)}</div>${bigs(o.big,o.c)}</div>`).join('')+(m==1?'':oth)+(m==1?oth+finLine:finBox)}
+ else if(m==2)h=cols(0)+prevLine+oth+finBox;
+ else if(m==3)h=finHero+oth+'<div style="margin-top:8px">'+items.map((o,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 4px;${i<items.length-1?'border-bottom:1px solid var(--ln)':''}"><div><div style="font-weight:700;color:${o.c||'var(--tx)'}">${o.l}</div>${sub(o.sub)}</div>${bigs(o.big,o.c,22)}</div>`).join('')+'</div>';
+ else if(m==4){
+  const dot=(c,sz)=>`<span style="position:absolute;right:${-22-(sz-11)/2}px;top:50%;margin-top:${-sz/2}px;width:${sz}px;height:${sz}px;border-radius:50%;background:${c}"></span>`;
+  h=`<div style="position:relative;padding-right:22px;margin-top:6px"><div style="position:absolute;right:5px;top:8px;bottom:8px;width:2px;background:var(--ln)"></div>`
+  +items.map(o=>`<div style="position:relative;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0">${dot(o.c||mu,11)}<div><div style="font-weight:700;color:${o.c||'var(--tx)'}">${o.l}</div>${sub(o.sub)}</div>${bigs(o.big,o.c,22)}</div>`).join('')
+  +(Math.abs(s.oth)>.5?`<div style="position:relative;padding:4px 0">${dot(mu,9)}<div class=rw><small>تعديلات / تسويات رصيد</small><b dir=ltr>${s.oth>0?'+':'−'}${fmt(Math.abs(s.oth))}</b></div></div>`:'')
+  +`<div style="position:relative;display:flex;justify-content:space-between;align-items:center;padding:10px 0 2px">${dot('var(--tx)',15)}<b>المتبقي</b>${fbig(26)}</div></div>`}
+ else if(m==6)h=cols(0)+prevCard+oth+finLine;
+ else h=cols(1)+prevLine+oth+finBox;
+ return h}
 function supRep(id){const ac=A(id),[a,b]=rngOf(V.rr||'1',V.rd1,V.rd2),s=supAgg(id,x=>x.d>=a&&x.d<=b,x=>x.d>b),inr=S.tx.filter(x=>x.d>=a&&x.d<=b&&(x.f==id||x.t==id));
  return `<div class=tot><small>${esc(ac.name)} — ${a==b?a:a+' ← '+b}</small><h1>${supHead(s.close)}</h1><small>المتبقي في نهاية الفترة</small></div>`+supSumHtml(s,id)+`<b style="display:block;margin:10px 0 6px">العمليات (${inr.length})</b>`+(inr.slice(0,60).map(row).join('')||'<div class=empty>لا توجد عمليات في هذه الفترة</div>')}
 function accSumHtml(q,id){if(q.sup)return supSumHtml(q.sup,id);const m=sdCur();if(m==0)return accSumOld(q);
@@ -506,7 +546,7 @@ function gLim(a,col){const R=[['اليوم',used(a,ymd()),a.dl],['الشهر',us
 const vwGet=T=>(V.tv&&V.tv[T])||(S.vw&&S.vw[T])||{v:T=='machine'||T=='client'?'grid':'list',o:'auto'};
 function ordAcc(l,o){const la=lastAct(),bv=a=>a.ty=='client'?Math.abs(a.bal):a.bal;if(o=='new')return l.slice().sort((x,y)=>(la[y.id]||'').localeCompare(la[x.id]||'')||bv(y)-bv(x));if(o=='bal')return l.slice().sort((x,y)=>bv(y)-bv(x));if(o=='low')return l.slice().sort((x,y)=>bv(x)-bv(y));if(o=='name')return l.slice().sort((x,y)=>x.name.localeCompare(y.name,'ar'));return srtAcc(l)}
 function vwOpt(T){const w=vwGet(T),VS=[['grid','▦ شبكة'],['circle','◯ دائري'],['list','☰ أفقي (قائمة)']],BP=[['cur','الحالي'],['band','شريط الرصيد'],['top','الرصيد في الأعلى'],['foot','شريط سفلي ملوّن'],['color','رصيد ملوّن تحت الاسم']],OS=[['auto','تلقائي (الأحدث ثم الأعلى رصيدًا)'],['new','الأحدث معاملات'],['bal','الأعلى رصيدًا'],['low','الأقل رصيدًا'],['name','أبجدي']],op=(L,c)=>L.map(o=>`<option value=${o[0]} ${c==o[0]?'selected':''}>${o[1]}</option>`).join('');
- sheet('⚙️ خيارات العرض — '+TY[T].n,`<label>شكل العرض</label><select id=vv>${op(VS,w.v)}</select><label>شكل الليمت في الشبكة</label><select id=vgs><option value=bars ${S.gls!='rings'?'selected':''}>▬ أشرطة (يوم وشهر)</option><option value=rings ${S.gls=='rings'?'selected':''}>◔ حلقات</option></select><label>مكان الرصيد في الكارت (عرض الشبكة)</label><select id=vbp>${op(BP,w.bp||'cur')}</select><label>الترتيب</label><select id=vo>${op(OS,w.o)}</select>${T=='client'?`<label>شكل ملخص وتقرير حساب المورد</label><select id=vss><option value=1 ${sdSup()==1?'selected':''}>١ — صفوف (استلام / سابق / تحويل)</option><option value=2 ${sdSup()==2?'selected':''}>٢ — مربعين (استلام وتحويل جنب بعض)</option></select>`:''}<label style="display:flex;gap:8px;align-items:center;color:var(--tx)"><input type=checkbox id=vsv style="width:auto" ${S.vw&&S.vw[T]?'checked':''}> حفظ هذا الاختيار لقسم ${TY[T].n}</label><button class=btn onclick="vwSave('${T}')">تطبيق</button>`)}
+ sheet('⚙️ خيارات العرض — '+TY[T].n,`<label>شكل العرض</label><select id=vv>${op(VS,w.v)}</select><label>شكل الليمت في الشبكة</label><select id=vgs><option value=bars ${S.gls!='rings'?'selected':''}>▬ أشرطة (يوم وشهر)</option><option value=rings ${S.gls=='rings'?'selected':''}>◔ حلقات</option></select><label>مكان الرصيد في الكارت (عرض الشبكة)</label><select id=vbp>${op(BP,w.bp||'cur')}</select><label>الترتيب</label><select id=vo>${op(OS,w.o)}</select>${T=='client'?`<label>شكل ملخص وتقرير حساب المورد</label><select id=vss>${SSOPT.map(o=>`<option value=${o[0]} ${sdSup()==o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>`:''}<label style="display:flex;gap:8px;align-items:center;color:var(--tx)"><input type=checkbox id=vsv style="width:auto" ${S.vw&&S.vw[T]?'checked':''}> حفظ هذا الاختيار لقسم ${TY[T].n}</label><button class=btn onclick="vwSave('${T}')">تطبيق</button>`)}
 function vwSave(T){if($('vss'))S.ss=+$('vss').value;const w={v:$('vv').value,o:$('vo').value,bp:$('vbp').value};V.tv=V.tv||{};V.tv[T]=w;S.gls=$('vgs').value;S.vw=S.vw||{};if($('vsv').checked)S.vw[T]=w;else delete S.vw[T];closeSh();render()}
 let TYK='drawer';
 function secHi(){Object.keys(TY).forEach(k=>{const e=$('tic_'+k);if(e)e.style.outline=k==TYK?'2px solid var(--p)':''})}
