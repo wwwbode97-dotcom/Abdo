@@ -346,6 +346,14 @@ table.sdt{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
 .sdhero div{background:var(--cd2);border:1px solid var(--ln);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;color:var(--mu)}
 .sdhero b{display:block;font-size:17px;font-weight:800;direction:ltr;margin-top:2px;color:var(--tx)}.sdhero b.up{color:#4cd48a}.sdhero b.dn{color:#ff6b6b}
 </style>
+<style>/* تعديل: المتبقي بعد خصم الداخل والخارج والربح/الخسارة */
+.sdr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 0;border-top:1px solid var(--ln);font-size:13px}.sdr:first-child{border-top:0}
+.sdr small{display:block;font-size:11px;color:var(--mu)}.sdr b{font-size:15px;font-weight:800;white-space:nowrap}
+.sdfin{border-radius:14px;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.45);padding:10px;text-align:center;margin-top:8px}
+.sdfin small{display:block;font-size:13px;color:#7db8ff}.sdfin b{display:block;font-size:28px;font-weight:800;direction:ltr}
+.sdfin em{display:block;font-size:12px;font-style:normal;color:var(--mu);direction:ltr;margin-top:2px}
+.sdnote{font-size:11px;color:var(--mu);text-align:center;margin-top:6px}
+</style>
 </head>
 <body>
 <div id="gate"><div class="gl">📒</div><h1>دفتر الحسابات</h1><p>سجّل الدخول بحساب جوجل. بياناتك بتتحفظ على موبايلك وعلى جوجل درايف بتاعك فقط.</p>
@@ -427,89 +435,47 @@ function qdInit(){const x=document.querySelector('#sh .qx');if(!x||x.querySelect
 const _xferQ0=xferQ;xferQ=function(){const r=_xferQ0.apply(this,arguments);try{qdInit()}catch(e){}return r};
 const _qSum0=qSum;qSum=function(e,v,f,t,pf){const r=_qSum0.apply(this,arguments);try{qFt(v,f,t,pf)}catch(x){}return r};
 function qsSetHtml(){const q=Object.assign({amt:100,dr:100,wl:100,pf:100,kp:100},S.qs||{}),P=[['amt','خانة المبلغ'],['dr','مربع الدرج'],['wl','مربع المحفظة'],['pf','الربح (الشريط / الخانات)'],['kp','لوحة الأرقام']],op=(v,t,c)=>`<option value=${v} ${c==v?'selected':''}>${t}</option>`;
- return `<b style="display:block;margin:16px 0 4px">📱 شاشة الاستلام / التحويل لعميل</b><label>شكل مربعات من/إلى</label><select id=qs_d>${QDL.map(d=>op(d,QDN[d],qdCur())).join('')}</select>${P.map(([k,n])=>`<label>${n} <b id=qv_${k}>${q[k]}%</b></label><input type=range id=qs_${k} min=60 max=150 step=5 value="${q[k]}" style="height:30px;padding:0" oninput="$('qv_${k}').textContent=this.value+'%'">`).join('')}<button class="btn g" onclick="qsReset()">رجوع للأحجام الأصلية</button><b style="display:block;margin:16px 0 4px">📊 عرض ليمت المحافظ</b><select id=qs_l>${op('rem','المتبقي فقط',limMode())}${op('both','المستهلك والمتبقي',limMode())}${op('used','المستهلك فقط',limMode())}</select>`}
+ return `<b style="display:block;margin:16px 0 4px">📱 شاشة الاستلام / التحويل لعميل</b><label>شكل مربعات من/إلى</label><select id=qs_d>${QDL.map(d=>op(d,QDN[d],qdCur())).join('')}</select>${P.map(([k,n])=>`<label>${n} <b id=qv_${k}>${q[k]}%</b></label><input type=range id=qs_${k} min=60 max=150 step=5 value="${q[k]}" style="height:30px;padding:0" oninput="$('qv_${k}').textContent=this.value+'%'">`).join('')}<button class="btn g" onclick="qsReset()">رجوع للأحجام الأصلية</button><b style="display:block;margin:16px 0 4px">🧾 صفحة حساب العميل / المورد</b><label>شكل الملخص والتقرير</label><select id=qs_s>${[[1,'كشف حساب بالترتيب'],[2,'ثلاث خانات والمتبقي'],[3,'جدول بأثر كل اتجاه'],[4,'جمل بسيطة'],[0,'الشكل القديم']].map(([v,t])=>op(v,t,sdCur())).join('')}</select><b style="display:block;margin:16px 0 4px">📊 عرض ليمت المحافظ</b><select id=qs_l>${op('rem','المتبقي فقط',limMode())}${op('both','المستهلك والمتبقي',limMode())}${op('used','المستهلك فقط',limMode())}</select>`}
 function qsReset(){['amt','dr','wl','pf','kp'].forEach(k=>{$('qs_'+k).value=100;$('qv_'+k).textContent='100%'})}
-function qsSave(){if($('qs_d'))S.qd=+$('qs_d').value;if($('qs_amt')){S.qs={};['amt','dr','wl','pf','kp'].forEach(k=>{S.qs[k]=+$('qs_'+k).value||100})}if($('qs_l'))S.lm=$('qs_l').value}
+function qsSave(){if($('qs_d'))S.qd=+$('qs_d').value;if($('qs_amt')){S.qs={};['amt','dr','wl','pf','kp'].forEach(k=>{S.qs[k]=+$('qs_'+k).value||100})}if($('qs_l'))S.lm=$('qs_l').value;if($('qs_s'))S.sd=+$('qs_s').value}
 /* تعديل: ملخص حساب العميل/المورد (S.sd: 0 القديم، 1 كارت، 2 جدول، 3 جمل، 4 ملخص+تفاصيل) */
 const nO=n=>n==1?'عملية':n==2?'عمليتين':n>=3&&n<=10?n+' عمليات':n+' عملية';
-const sdCur=()=>[0,1,2,3,4,5].includes(S.sd)?S.sd:5;
+const sdCur=()=>[0,1,2,3,4].includes(S.sd)?S.sd:1;
 const accSumOld=q=>`<div class=row2><div><small>📥 استلام (${q.ni})</small><div class="tv up">${fmt(q.inn)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.innc)}</b></small></div><div><small>📤 تحويل (${q.no})</small><div class="tv dn">${fmt(q.out)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.outc)}</b></small></div></div><div class=rw><small>💰 العمولات / الأرباح</small><b class="${q.cm>=0?'up':'dn'}">${fmt(q.cm)}</b></div>`;
-
-/* ===== تعديل: ملخص/تقرير حساب المورد — الربح/الخسارة بيتخصم جوه كل اتجاه، ومفيش جمع استلام مع تحويل =====
-   موجب = عليه (هتاخد منه) • سالب = له (هتدفع له) */
-function supAgg(id,inP,isAft){
- const ac=A(id),mine=S.tx.filter(x=>x.f==id||x.t==id),per=mine.filter(inP),aft=mine.filter(x=>isAft(x)),
- eff=x=>(x.t==id?x.b:0)-(x.f==id?x.a:0),sm=l=>l.reduce((z,x)=>z+eff(x),0),
- close=r2(ac.bal-sm(aft)),prev=r2(close-sm(per)),
- o={n:0,m:0,pf:0,net:0},i={n:0,m:0,pf:0,net:0};let oth=0;
- per.forEach(x=>{const d=x.k=='x'?supDir(x):'';
-  if(!d){oth+=eff(x);return}
-  const out=d=='out',net=out?x.b:x.a,R=x.raw,pf=R?(out?net-R.M:R.M-net):(x.p||0),M=R?R.M:(out?net-pf:net+pf),t=out?o:i;
-  t.n++;t.m+=M;t.pf+=pf;t.net+=net});
- ['m','pf','net'].forEach(k=>{o[k]=r2(o[k]);i[k]=r2(i[k])});
- return{prev,close,o,i,oth:r2(oth),pf:r2(o.pf+i.pf),n:o.n+i.n}}
-function supHead(v){return fmt(Math.abs(v))+' ج <small style="font-size:13px;font-weight:400">'+(v>0.004?'عليه — هتاخد منه':v<-0.004?'له — هتدفع له':'متسدد ✓')+'</small>'}
-function supSumHtml(s,id,mm,ref){
- const m=mm||sdCur(),Z=.004,
- sg=x=>x>0?'+'+fmt(x):x<0?'−'+fmt(-x):'0',cc=x=>x>0?'up':x<0?'dn':'',
- pl=x=>x>0?'ربح':x<0?'خسارة':'ربح / خسارة',
- W=v=>v>Z?'عليه':v<-Z?'له':'✓',
- FV=v=>fmt(Math.abs(v))+' <small style="font-size:12px;font-weight:400;color:var(--mu)">'+W(v)+'</small>',
- SAY=v=>v>Z?`هتاخد منه <b class=up>${fmt(v)}</b>`:v<-Z?`هتدفع له <b class=dn>${fmt(-v)}</b>`:'الحساب متسدد ✓',
- O=s.o,I=s.i,P=s.prev,F=s.close,LO='حوّلت له',LI='استلمت منه',
- eq=(M,pf,minus)=>{const neg=minus?pf>0:pf<0;return pf?`${fmt(M)} ${neg?'−':'+'} ${fmt(Math.abs(pf))}`:fmt(M)},
- say=x=>x<0?`خسرت <b class=dn>${fmt(-x)}</b>`:x>0?`كسبت <b class=up>${fmt(x)}</b>`:'مفيش ربح ولا خسارة',
- oth=Math.abs(s.oth)>.5?`<div class=rw><small>تعديلات / تسويات رصيد</small><b class="${cc(s.oth)}" dir=ltr>${sg(s.oth)}</b></div>`:'',
- sw='',
- hint='<small style="display:block;color:var(--mu);margin-top:6px;font-size:11px">عليه = هتاخد منه • له = هتدفع له</small>';
- const fin=`<div class=sdc style="text-align:center"><div class=sdh style="justify-content:center"><b>المتبقي النهائي</b></div><div class=sdb style="text-align:center;font-size:30px">${FV(F)}</div><div>${SAY(F)}</div></div>`;
+/* الحساب الصح: المتبقي = (اللي استلمته − الربح) − (اللي حوّلته + الربح/الخسارة) — بنفس منطق رصيد الحساب بالظبط، من غير جمع الاستلام مع التحويل */
+function supNet(R,I,prevBal){let mIn=0,mOut=0,dbt=0,crd=0,oth=0,fee=0;const gi={},go={};
+ R.forEach(x=>{const fi=x.f&&I.has(x.f),ti=x.t&&I.has(x.t),Rw=(x.k=='x'&&(x.raw||isMain(x)))?getRaw(x):null;
+  if(Rw&&fi&&!ti){dbt+=x.a||0;mIn+=Rw.M||0;gi[x.g||'i'+x.id]=1}
+  else if(Rw&&ti&&!fi){crd+=x.b||0;mOut+=Rw.M||0;fee+=Rw.fe||0;go[x.g||'i'+x.id]=1}
+  else{if(ti)oth-=x.b||0;if(fi)oth+=x.a||0}});
+ const pIn=r2(mIn-dbt),pOut=r2(crd-mOut),d=r2(dbt-crd+oth),prev=r2(-(prevBal||0));
+ return{mIn:r2(mIn),mOut:r2(mOut),dbt:r2(dbt),crd:r2(crd),oth:r2(oth),fee:r2(fee),pIn,pOut,d,prev,end:r2(prev+d),nIn:Object.keys(gi).length,nOut:Object.keys(go).length}}
+function supView(N,m,pl,showPrev){
+ const LI=pl?'استلمت منهم':'استلمت منه',LO=pl?'حوّلت لهم':'حوّلت له',
+ sg=x=>x>0?'+'+fmt(x):x<0?'−'+fmt(-x):'0',cc=x=>x>0?'up':x<0?'dn':'',ab=x=>fmt(Math.abs(x)),
+ own=x=>x>0?'له '+fmt(x):x<0?'ليك '+fmt(-x):'0',
+ hasI=N.nIn>0||N.mIn!=0,hasO=N.nOut>0||N.mOut!=0,np=r2(N.pIn+N.pOut),pv=showPrev&&Math.abs(N.prev)>.004,
+ fl=N.end>0?(pl?'المتبقي لهم عندك':'المتبقي له عندك'):N.end<0?(pl?'المتبقي ليك عندهم':'المتبقي ليك عنده'):'الحساب متساوي',
+ pw=(v,i,o)=>v>0?(i?'ربحك من الاستلام':'ربحك في التحويل'):(i?'خسارتك في الاستلام':'خسارتك في التحويل'),
+ pn=v=>v>0?'بيتخصم من حسابه':'بيتضاف على حسابه',
+ eqp=[];
+ if(pv)eqp.push(fmt(N.prev));
+ let eq='';
+ if(m==2){eq=(pv?ab(N.prev)+' '+(N.prev<0?'−':'+')+' ':'')+fmt(N.mIn)+' − '+fmt(N.mOut)+' '+(np>=0?'−':'+')+' '+ab(np)+(Math.abs(N.oth)>.004?' '+(N.oth>=0?'+':'−')+' '+ab(N.oth):'')}
+ else if(m==3){eq=(pv?ab(N.prev)+' '+(N.prev<0?'−':'+')+' ':'')+fmt(N.dbt)+' − '+fmt(N.crd)+(Math.abs(N.oth)>.004?' '+(N.oth>=0?'+':'−')+' '+ab(N.oth):'')}
+ const fin=`<div class=sdfin><small>${fl}</small><b>${ab(N.end)}</b>${eq?`<em>${eq}</em>`:''}</div>`,
+ note=(N.fee>0?`<div class=sdnote>رسوم المحافظ ${fmt(N.fee)} بتتخصم من محفظتك، مش من حساب المورد</div>`:'')+(Math.abs(N.oth)>.004&&m!=2&&m!=3?'':''),
+ R=(l,sub,v,c)=>`<div class=sdr><span>${l}${sub?`<small>${sub}</small>`:''}</span><b class="${c||''}" dir=ltr>${v}</b></div>`;
  let h='';
- if(m==1){
-  h=`<div class=sdc><div class=sdh><b>رصيد سابق</b><span>قبل الفترة</span></div><div class=sdb>${FV(P)}</div></div>`
-  +`<div class=sdc><div class=sdh><b class=dn>${LO}</b><span>${nO(O.n)}</span></div><div class=sdb>${fmt(O.m)}</div><div class=sdg><div class="sdm ${O.pf<0?'ls':O.pf>0?'pr':''}">${pl(O.pf)}<b>${sg(O.pf)}</b></div><div class=sdm dn>الصافي عليه<b>${fmt(O.net)}</b></div></div></div>`
-  +`<div class=sdc><div class=sdh><b class=up>${LI}</b><span>${nO(I.n)}</span></div><div class=sdb>${fmt(I.m)}</div><div class=sdg><div class="sdm ${I.pf<0?'ls':I.pf>0?'pr':''}">${pl(I.pf)}<b>${sg(I.pf)}</b></div><div class=sdm up>الصافي له<b>${fmt(I.net)}</b></div></div></div>`
-  +(oth?`<div class=sdc style="padding:2px 12px">${oth}</div>`:'')+fin}
- else if(m==2){
-  h=`<div class=sdc><table class=sdt><tr><th></th><th>المبلغ</th><th>ربح / خسارة</th><th>الصافي</th></tr>`
-  +`<tr><td>رصيد سابق<small>${W(P)}</small></td><td></td><td></td><td class="${cc(P)}">${sg(P)}</td></tr>`
-  +`<tr><td class=dn>${LO}<small>${nO(O.n)}</small></td><td>${fmt(O.m)}</td><td class="${cc(O.pf)}">${sg(O.pf)}</td><td class=dn>+${fmt(O.net)}</td></tr>`
-  +`<tr><td class=up>${LI}<small>${nO(I.n)}</small></td><td>${fmt(I.m)}</td><td class="${cc(I.pf)}">${sg(I.pf)}</td><td class=up>−${fmt(I.net)}</td></tr>`
-  +(Math.abs(s.oth)>.5?`<tr><td>تعديلات رصيد</td><td></td><td></td><td class="${cc(s.oth)}">${sg(s.oth)}</td></tr>`:'')
-  +`<tr class=tt><td>المتبقي<small>${W(F)}</small></td><td></td><td class="${cc(s.pf)}">${sg(s.pf)}</td><td class="${cc(F)}">${sg(F)}</td></tr></table>${hint}</div>`}
- else if(m==3){
-  h=`<div class="sdc sds"><b>رصيد سابق:</b> ${FV(P)}</div>`
-  +`<div class="sdc sds"><div><b class=dn>${LO}</b> ${fmt(O.m)} ج (${nO(O.n)})</div><div>${say(O.pf)} ← عليه <b class=dn>${fmt(O.net)}</b></div></div>`
-  +`<div class="sdc sds"><div><b class=up>${LI}</b> ${fmt(I.m)} ج (${nO(I.n)})</div><div>${say(I.pf)} ← له <b class=up>${fmt(I.net)}</b></div></div>`
-  +(oth?`<div class=sdc style="padding:2px 12px">${oth}</div>`:'')
-  +`<div class="sdc sds" style="text-align:center;font-size:15px"><b>الخلاصة:</b> ${SAY(F)}</div>`}
- else if(m==4){
-  const ch=r2(F-P);
-  h=`<div class=sdhero><div>رصيد سابق<b class="${cc(P)}">${fmt(Math.abs(P))}</b><small>${W(P)}</small></div><div>صافي الفترة<b class="${cc(ch)}">${fmt(Math.abs(ch))}</b><small>${W(ch)}</small></div><div>المتبقي<b class="${cc(F)}">${fmt(Math.abs(F))}</b><small>${W(F)}</small></div></div>`
-  +`<div class=sdc style="padding:2px 12px"><div class=rw><span class=dn>${LO} — ${nO(O.n)}</span><b class=dn dir=ltr>${fmt(O.m)}</b></div><div class=rw style="border-top:0;padding-top:0"><span>${pl(O.pf)}</span><b class="${cc(O.pf)}" dir=ltr>${sg(O.pf)}</b></div><div class=rw style="border-top:0;padding-top:0"><span class=dn>الصافي عليه</span><b class=dn dir=ltr>${fmt(O.net)}</b></div>`
-  +`<div class=rw style="border-top:1px solid var(--ln)"><span class=up>${LI} — ${nO(I.n)}</span><b class=up dir=ltr>${fmt(I.m)}</b></div><div class=rw style="border-top:0;padding-top:0"><span>${pl(I.pf)}</span><b class="${cc(I.pf)}" dir=ltr>${sg(I.pf)}</b></div><div class=rw style="border-top:0;padding-top:0"><span class=up>الصافي له</span><b class=up dir=ltr>${fmt(I.net)}</b></div>${oth}</div>`}
- else{
-  const ln=(l,sub,v,c)=>`<div class=rw style="padding:7px 0;border-top:1px solid var(--ln)"><span>${l}${sub?`<small style="display:block;color:var(--mu);font-size:11px">${sub}</small>`:''}</span><b class="${c||''}" dir=ltr>${v}</b></div>`;
-  h=`<div class=sdc style="padding:2px 12px">`
-  +ln('رصيد سابق',W(P)=='✓'?'متسدد':'قبل الفترة — '+W(P),sg(P),cc(P))
-  +ln('＋ '+LO+' ('+nO(O.n)+')',O.n?eq(O.m,O.pf,0)+' (بعد ال'+(O.pf<0?'خسارة':O.pf>0?'ربح':'ربح')+')':'',O.n?'+'+fmt(O.net):'0','dn')
-  +ln('－ '+LI+' ('+nO(I.n)+')',I.n?eq(I.m,I.pf,1)+' (بعد ال'+(I.pf>0?'ربح':I.pf<0?'خسارة':'ربح')+')':'',I.n?'−'+fmt(I.net):'0','up')
-  +(Math.abs(s.oth)>.5?ln('± تعديلات / تسويات','',sg(s.oth),cc(s.oth)):'')
-  +`<div class=rw style="padding:9px 0;border-top:2px solid var(--p)"><span><b>＝ المتبقي</b><small style="display:block;color:var(--mu);font-size:11px">${SAY(F)}</small></span><b class="${cc(F)}" dir=ltr style="font-size:20px">${sg(F)}</b></div></div>${hint}`}
- return sw+h}
-function supRep(id){const ac=A(id),[a,b]=rngOf(V.rr||'1',V.rd1,V.rd2),s=supAgg(id,x=>x.d>=a&&x.d<=b,x=>x.d>b),inr=S.tx.filter(x=>x.d>=a&&x.d<=b&&(x.f==id||x.t==id));
- return `<div class=tot><small>${esc(ac.name)} — ${a==b?a:a+' ← '+b}</small><h1>${supHead(s.close)}</h1><small>المتبقي في نهاية الفترة</small></div>`+supSumHtml(s,id,0,'render()')+`<b style="display:block;margin:10px 0 6px">العمليات (${inr.length})</b>`+(inr.slice(0,60).map(row).join('')||'<div class=empty>لا توجد عمليات في هذه الفترة</div>')}
-function accSumHtml(q,id){if(q.sup)return supSumHtml(q.sup,id,0,'detail('+id+')');const m=sdCur();if(m==0)return accSumOld(q);
- const a=A(id),cl=a&&a.ty=='client',LO=cl?'حوّلت له':'تحويل',LI=cl?'استلمت منه':'استلام',po=r2(q.outc-q.out),pi=r2(q.innc-q.inn),tp=r2(po+pi),oth=r2(q.cm-tp),
- sg=x=>x>0?'+'+fmt(x):x<0?'−'+fmt(-x):'0',cc=x=>x>0?'up':x<0?'dn':'',
- pl=x=>x>0?'ربح':x<0?'خسارة':'ربح / خسارة',tl=x=>x>0?'الإجمالي بعد الربح':x<0?'الإجمالي بعد الخسارة':'الإجمالي',
- D=[{l:LO,n:q.no,m:q.out,p:po,t:q.outc},{l:LI,n:q.ni,m:q.inn,p:pi,t:q.innc}],
- ex=Math.abs(oth)>.5?`<div class=rw><small>رسوم / عمولات أخرى مسجلة</small><b class="${cc(oth)}" dir=ltr>${sg(oth)}</b></div>`:'';
- let h='';
- if(m==1)h=D.map(d=>`<div class=sdc><div class=sdh><b>${d.l}</b><span>${nO(d.n)}</span></div><div class=sdb>${fmt(d.m)}</div><div class=sdg><div class="sdm ${d.p<0?'ls':d.p>0?'pr':''}">${pl(d.p)}<b>${sg(d.p)}</b></div><div class="sdm">${tl(d.p)}<b>${fmt(d.t)}</b></div></div></div>`).join('')+`<div class=sdc style="text-align:center;font-size:13px">ربحك الكلي: <b class="${cc(tp)}" dir=ltr>${sg(tp)}</b></div>`;
- else if(m==2)h=`<div class=sdc><table class=sdt><tr><th></th><th>المبلغ</th><th>ربح / خسارة</th><th>الإجمالي</th></tr>${D.map(d=>`<tr><td>${d.l}<small>${nO(d.n)}</small></td><td>${fmt(d.m)}</td><td class="${cc(d.p)}">${sg(d.p)}</td><td>${fmt(d.t)}</td></tr>`).join('')}<tr class=tt><td>المجموع</td><td>${fmt(r2(q.out+q.inn))}</td><td class="${cc(tp)}">${sg(tp)}</td><td>${fmt(r2(q.outc+q.innc))}</td></tr></table></div>`;
- else if(m==3)h=D.map(d=>`<div class="sdc sds"><div><b>${d.l}</b> ${fmt(d.m)} ج (${nO(d.n)})</div><div>${d.p<0?`خسرت فيها <b class=dn>${fmt(-d.p)}</b>`:d.p>0?`كسبت فيها <b class=up>${fmt(d.p)}</b>`:'مفيش ربح ولا خسارة'} ← الإجمالي <b>${fmt(d.t)}</b></div></div>`).join('')+`<div class="sdc sds" style="text-align:center">ربحك الكلي من الحساب ده: <b class="${cc(tp)}" dir=ltr>${sg(tp)}</b></div>`;
- else h=`<div class=sdhero><div>${LO}<b>${fmt(q.out)}</b></div><div>${LI}<b>${fmt(q.inn)}</b></div><div>ربحك الكلي<b class="${cc(tp)}">${sg(tp)}</b></div></div><div class=sdc style="padding:2px 12px">${D.map(d=>`<div class=rw><span>${d.l} — ${pl(d.p)}</span><b class="${cc(d.p)}" dir=ltr>${sg(d.p)}</b></div><div class=rw style="border-top:0;padding-top:0"><span>${tl(d.p)}</span><b dir=ltr>${fmt(d.t)}</b></div>`).join('')}</div>`;
- return h+(ex?`<div class=sdc style="padding:2px 12px">${ex}</div>`:'')}
+ if(m==1){h=`<div class=sdc>${pv?R('رصيد قبل الفترة','',own(N.prev)):''}${hasI?R(LI,nO(N.nIn),'+'+fmt(N.mIn),'up')+(N.pIn?R(pw(N.pIn,1),pn(N.pIn),sg(-N.pIn),cc(N.pIn)):''):''}${hasO?R(LO,nO(N.nOut),'−'+fmt(N.mOut),'dn')+(N.pOut?R(pw(N.pOut,0),pn(N.pOut),sg(-N.pOut),cc(N.pOut)):''):''}${Math.abs(N.oth)>.004?R('تسويات وتعديلات','',sg(N.oth),''):''}</div>`+fin}
+ else if(m==2){h=`<div class=sdhero><div>${LI}<b>${fmt(N.mIn)}</b></div><div>${LO}<b>${fmt(N.mOut)}</b></div><div>صافي ربحك<b class="${cc(np)}">${sg(np)}</b></div></div>`+fin+`<div class=sdc>${R('ربح / خسارة الاستلام','',sg(N.pIn),cc(N.pIn))}${R('ربح / خسارة التحويل','',sg(N.pOut),cc(N.pOut))}</div>`}
+ else if(m==3){h=`<div class=sdc><table class=sdt><tr><th></th><th>المبلغ</th><th>ربح / خسارة</th><th>أثره على حسابه</th></tr>${hasI?`<tr><td>${LI}<small>${nO(N.nIn)}</small></td><td>${fmt(N.mIn)}</td><td class="${cc(N.pIn)}">${sg(N.pIn)}</td><td>له ${fmt(N.dbt)}</td></tr>`:''}${hasO?`<tr><td>${LO}<small>${nO(N.nOut)}</small></td><td>${fmt(N.mOut)}</td><td class="${cc(N.pOut)}">${sg(N.pOut)}</td><td>منه ${fmt(N.crd)}</td></tr>`:''}</table></div>`+fin}
+ else{h=(pv?`<div class="sdc sds">رصيد قبل الفترة: <b dir=ltr>${own(N.prev)}</b></div>`:'')+(hasI?`<div class="sdc sds"><div><b>${LI}</b> ${fmt(N.mIn)} ج (${nO(N.nIn)})</div><div>${N.pIn?`${N.pIn>0?'ربحك':'خسارتك'} <b class="${cc(N.pIn)}">${ab(N.pIn)}</b> ${N.pIn>0?'اتخصم من':'اتضافت على'} حسابه`:'من غير ربح أو خسارة'} ← له <b>${fmt(N.dbt)}</b></div></div>`:'')+(hasO?`<div class="sdc sds"><div><b>${LO}</b> ${fmt(N.mOut)} ج (${nO(N.nOut)})</div><div>${N.pOut?`${N.pOut>0?'ربحك':'خسارتك'} <b class="${cc(N.pOut)}">${ab(N.pOut)}</b> ← `:''}اتخصم من حسابه <b>${fmt(N.crd)}</b></div></div>`:'')+fin}
+ return h+note}
+function accSumHtml(q,id){const m=sdCur(),a=A(id);if(m==0||!(a&&a.ty=='client'))return accSumOld(q);
+ const p=q.p,ls=q.ls,aft=x=>(x.f==id||x.t==id)&&(p.m=='all'?true:p.m=='day'?x.d>=p.d:(ls&&(x.ts?x.ts>=ls.ts:x.d>ls.d))),
+ dA=S.tx.filter(aft).reduce((t,x)=>t+(x.t==id?(x.b||0):0)-(x.f==id?(x.a||0):0),0);
+ return supView(supNet(q.L,new Set([id]),r2((a.bal||0)-dA)),m,false,true)}
 function gcPaint(){document.querySelectorAll('.gx[data-aid]').forEach(el=>{const a=A(+el.dataset.aid),im=a&&a.img;if(!im)return;logoCol(im).then(c=>{if(c)el.style.setProperty('--gc',c)})})}
 let _pt=null;const _render0=render;render=function(){_render0.apply(this,arguments);gcPaint();const t=V.tab;if(t=='exp'&&_pt!='exp'&&typeof expNew=='function'&&expSrcs().length)setTimeout(expNew,0);_pt=t};
 function cardV(a,v){if(v=='list')return card(a);const c=a.ty=='client',bl=`<div class=bal style="color:${!c&&a.bal<0?'#d93a3a':'var(--tx)'}">${fmt(c?-a.bal:a.bal)}${c?`<small>${a.bal>0?'دين عليه':a.bal<0?'دين عليا':''}</small>`:''}</div>`;
@@ -525,9 +491,9 @@ function gLim(a,col){const R=[['اليوم',used(a,ymd()),a.dl],['الشهر',us
  return rg?`<div class=glr>${R.map(r=>{const p=pc(r),q=Math.min(100,p);return `<div class=glw><div class=gring style="background:conic-gradient(${cl(p)} ${q}%,#ffffff1f 0)"><span>${p}%</span></div><small>${r[0]}</small>${limRg(r[1],r[2])}</div>`}).join('')}</div>`:`<div class=glb>${R.map(r=>{const p=pc(r);return `<div><div class=glt><span>${r[0]}</span><span>${p}%</span></div><div class=glx><i style="width:${Math.min(100,p)}%;background:${limStripe(p,cl(p))}"></i></div><small>${limTx(r[1],r[2])}</small></div>`}).join('')}</div>`}
 const vwGet=T=>(V.tv&&V.tv[T])||(S.vw&&S.vw[T])||{v:T=='machine'||T=='client'?'grid':'list',o:'auto'};
 function ordAcc(l,o){const la=lastAct(),bv=a=>a.ty=='client'?Math.abs(a.bal):a.bal;if(o=='new')return l.slice().sort((x,y)=>(la[y.id]||'').localeCompare(la[x.id]||'')||bv(y)-bv(x));if(o=='bal')return l.slice().sort((x,y)=>bv(y)-bv(x));if(o=='low')return l.slice().sort((x,y)=>bv(x)-bv(y));if(o=='name')return l.slice().sort((x,y)=>x.name.localeCompare(y.name,'ar'));return srtAcc(l)}
-function vwOpt(T){const w=vwGet(T),VS=[['grid','▦ شبكة'],['circle','◯ دائري'],['list','☰ أفقي (قائمة)']],BP=[['cur','الحالي'],['band','شريط الرصيد'],['top','الرصيد في الأعلى'],['foot','شريط سفلي ملوّن'],['color','رصيد ملوّن تحت الاسم']],OS=[['auto','تلقائي (الأحدث ثم الأعلى رصيدًا)'],['new','الأحدث معاملات'],['bal','الأعلى رصيدًا'],['low','الأقل رصيدًا'],['name','أبجدي']],SD=[[1,'كارت لكل اتجاه'],[2,'جدول واحد'],[3,'جمل بسيطة'],[5,'معادلة: سابق + تحويل − استلام = المتبقي'],[4,'ملخص فوق والتفاصيل تحته']],op=(L,c)=>L.map(o=>`<option value=${o[0]} ${c==o[0]?'selected':''}>${o[1]}</option>`).join(''),sd=[1,2,3,4,5].includes(S.sd)?S.sd:5;
- sheet('⚙️ خيارات العرض — '+TY[T].n,`<label>شكل العرض</label><select id=vv>${op(VS,w.v)}</select><label>شكل الليمت في الشبكة</label><select id=vgs><option value=bars ${S.gls!='rings'?'selected':''}>▬ أشرطة (يوم وشهر)</option><option value=rings ${S.gls=='rings'?'selected':''}>◔ حلقات</option></select><label>مكان الرصيد في الكارت (عرض الشبكة)</label><select id=vbp>${op(BP,w.bp||'cur')}</select><label>الترتيب</label><select id=vo>${op(OS,w.o)}</select>${T=='client'?`<b style="display:block;margin:16px 0 4px">🧾 تقرير الموردين</b><label>شكل ملخص التقرير (اختيار واحد فقط)</label><select id=supSd>${op(SD,sd)}</select>`:''}<label style="display:flex;gap:8px;align-items:center;color:var(--tx)"><input type=checkbox id=vsv style="width:auto" ${S.vw&&S.vw[T]?'checked':''}> حفظ هذا الاختيار لقسم ${TY[T].n}</label><button class=btn onclick="vwSave('${T}')">تطبيق</button>`)}
-function vwSave(T){const w={v:$('vv').value,o:$('vo').value,bp:$('vbp').value};V.tv=V.tv||{};V.tv[T]=w;S.gls=$('vgs').value;S.vw=S.vw||{};if($('vsv').checked)S.vw[T]=w;else delete S.vw[T];if(T=='client'&&$('supSd'))S.sd=[1,2,3,4,5].includes(+$('supSd').value)?+$('supSd').value:5;save();closeSh();render()}
+function vwOpt(T){const w=vwGet(T),VS=[['grid','▦ شبكة'],['circle','◯ دائري'],['list','☰ أفقي (قائمة)']],BP=[['cur','الحالي'],['band','شريط الرصيد'],['top','الرصيد في الأعلى'],['foot','شريط سفلي ملوّن'],['color','رصيد ملوّن تحت الاسم']],OS=[['auto','تلقائي (الأحدث ثم الأعلى رصيدًا)'],['new','الأحدث معاملات'],['bal','الأعلى رصيدًا'],['low','الأقل رصيدًا'],['name','أبجدي']],op=(L,c)=>L.map(o=>`<option value=${o[0]} ${c==o[0]?'selected':''}>${o[1]}</option>`).join('');
+ sheet('⚙️ خيارات العرض — '+TY[T].n,`<label>شكل العرض</label><select id=vv>${op(VS,w.v)}</select><label>شكل الليمت في الشبكة</label><select id=vgs><option value=bars ${S.gls!='rings'?'selected':''}>▬ أشرطة (يوم وشهر)</option><option value=rings ${S.gls=='rings'?'selected':''}>◔ حلقات</option></select><label>مكان الرصيد في الكارت (عرض الشبكة)</label><select id=vbp>${op(BP,w.bp||'cur')}</select><label>الترتيب</label><select id=vo>${op(OS,w.o)}</select><label style="display:flex;gap:8px;align-items:center;color:var(--tx)"><input type=checkbox id=vsv style="width:auto" ${S.vw&&S.vw[T]?'checked':''}> حفظ هذا الاختيار لقسم ${TY[T].n}</label><button class=btn onclick="vwSave('${T}')">تطبيق</button>`)}
+function vwSave(T){const w={v:$('vv').value,o:$('vo').value,bp:$('vbp').value};V.tv=V.tv||{};V.tv[T]=w;S.gls=$('vgs').value;S.vw=S.vw||{};if($('vsv').checked)S.vw[T]=w;else delete S.vw[T];closeSh();render()}
 let TYK='drawer';
 function secHi(){Object.keys(TY).forEach(k=>{const e=$('tic_'+k);if(e)e.style.outline=k==TYK?'2px solid var(--p)':''})}
 let TYP={},TYO=[],TYS={};
@@ -665,7 +631,7 @@ function dayClose(){const t=ymd(),un=S.acc.filter(a=>(a.ty=='drawer'||a.ty=='mac
 function rngOf(r,a1,a2){const t=ymd();if(r=='1')return[t,t];if(r=='set'){const ls=lastSet(+V.ra);if(ls)return[ls.d,t];const ds=S.tx.filter(x=>x.f==V.ra||x.t==V.ra).map(x=>x.d).sort();return[ds[0]||t,t]}if(r=='7')return[addD(t,-6),t];if(r=='30')return[addD(t,-29),t];if(r=='m')return[t.slice(0,7)+'-01',t];const a=a1||t,b=a2||t;return a<=b?[a,b]:[b,a]}
 function raOpts(q,id){return srtAcc(S.acc.filter(a=>!q||norm(a.name+' '+(a.no||'')+(a.grp||'')+(a.kind||'')).includes(norm(q)))).map(a=>`<option value=${a.id} ${a.id==id?'selected':''}>${TY[a.ty].i} ${a.grp?a.grp+' - ':''}${a.name}</option>`).join('')}
 function raFlt(q){const e=$('ra');if(!e)return;e.innerHTML=raOpts(q,V.ra);if(e.options.length){V.ra=+e.value;$('rb').innerHTML=accRep(V.ra)}else $('rb').innerHTML='<div class=empty>لا توجد نتائج</div>'}
-function accRep0(id){const ac=A(id);if(!ac)return '<div class=empty>اختر حسابًا</div>';if(ac.ty=='client')return supRep(id);const[a,b]=rngOf(V.rr||'1',V.rd1,V.rd2),sg=ac.ty=='client'?-1:1,eff=x=>(x.t==id?x.b:0)-(x.f==id?x.a:0),
+function accRep0(id){const ac=A(id);if(!ac)return '<div class=empty>اختر حسابًا</div>';const[a,b]=rngOf(V.rr||'1',V.rd1,V.rd2),sg=ac.ty=='client'?-1:1,eff=x=>(x.t==id?x.b:0)-(x.f==id?x.a:0),
  after=S.tx.filter(x=>x.d>b).reduce((s,x)=>s+eff(x),0),inr=S.tx.filter(x=>x.d>=a&&x.d<=b&&(x.f==id||x.t==id)),ch=inr.reduce((s,x)=>s+eff(x),0),close=ac.bal-after,open=close-ch,
  din=inr.reduce((s,x)=>s+(x.t==id?x.b:0),0),dout=inr.reduce((s,x)=>s+(x.f==id?x.a:0),0),pf=inr.reduce((s,x)=>s+(x.p||0),0),L=(l,v,c)=>`<div class=tx><div class=r1><span>${l}</span><b ${c?`class=${c}`:''}>${fmt(v)}</b></div></div>`;
  return `<div class=tot><small>${ac.name} — ${a==b?a:a+' ← '+b}</small><h1>${fmt(sg*close)} ج</h1><small>الرصيد في نهاية الفترة${ac.ty=='client'?' (سالب = دين عليه)':''}</small></div>`+L('رصيد أول الفترة',sg*open)+L('إجمالي الداخل',din,'up')+L('إجمالي الخارج',dout,'dn')+L('صافي الحركة',sg*ch)+L('عدد العمليات',inr.length)+L('الربح من عملياته',pf,pf>=0?'up':'dn')+`<b style="display:block;margin:10px 0 6px">العمليات</b>`+(inr.slice(0,60).map(row).join('')||'<div class=empty>لا توجد عمليات في هذه الفترة</div>')}
@@ -753,8 +719,8 @@ const ANM={
  cap:()=>[anM1('i','⬇️ إدخال نقدية','#4cd48a',(a,b)=>anCap(a,b,'in')),anM1('o','⬆️ إخراج نقدية','#ff6b6b',(a,b)=>anCap(a,b,'out')),anM1('n','⚖️ الصافي','#2bb5bd',capNet)],
  set:()=>[anM1('n','⚖️ صافي فروق التسويات','#2bb5bd',(a,b)=>r2(anSet(a,b).reduce((s,x)=>s+x.diff,0))),anM1('z','🔻 إجمالي العجز','#ff6b6b',(a,b)=>r2(-anSet(a,b).filter(x=>x.diff<0).reduce((s,x)=>s+x.diff,0)),{bad:1}),anM1('p','🔺 إجمالي الزيادة','#4cd48a',(a,b)=>r2(anSet(a,b).filter(x=>x.diff>0).reduce((s,x)=>s+x.diff,0))),anM1('c','🔢 عدد التسويات','#93a7a6',(a,b)=>anSet(a,b).length,{n:1})],
  sales:q=>[anM1('c','🔢 عدد المبيعات','#1f78c8',(a,b)=>anSl(a,b,q).length,{n:1}),anM1('s','🛒 قيمة المبيعات','#1f78c8',(a,b)=>r2(anSl(a,b,q).reduce((s,x)=>s+x.b,0))),anM1('p','💚 الربح','#4cd48a',(a,b)=>r2(anSl(a,b,q).reduce((s,x)=>s+(x.p||0),0)))],
- ac:id=>{const ac=A(id),cl=ac&&ac.ty=='client',sg=1,eff=x=>(x.t==id?x.b:0)-(x.f==id?x.a:0),mine=(a,b)=>anTx(a,b).filter(x=>x.f==id||x.t==id);
-  return[anM1('i',cl?'📤 حوّلت له (عليه)':'⬇️ إجمالي الداخل','#4cd48a',(a,b)=>r2(mine(a,b).reduce((s,x)=>s+(x.t==id?x.b:0),0))),anM1('o',cl?'📥 استلمت منه (له)':'⬆️ إجمالي الخارج','#ff6b6b',(a,b)=>r2(mine(a,b).reduce((s,x)=>s+(x.f==id?x.a:0),0))),anM1('c',cl?'⚖️ صافي الفترة (+ عليه / − له)':'↕️ صافي الحركة','#2bb5bd',(a,b)=>r2(sg*mine(a,b).reduce((s,x)=>s+eff(x),0))),anM1('p',cl?'💚 ربح / خسارة العمليات':'💚 العمولات / الأرباح','#4cd48a',(a,b)=>r2(mine(a,b).reduce((s,x)=>s+(x.p||0),0))),anM1('n','🔢 عدد العمليات','#93a7a6',(a,b)=>mine(a,b).length,{n:1}),anM1('b',cl?'💼 المتبقي آخر الفترة (+ عليه / − له)':'💼 الرصيد آخر الفترة','#e8870e',(a,b)=>r2(sg*(ac.bal-S.tx.filter(x=>x.d>b).reduce((s,x)=>s+eff(x),0))))]},
+ ac:id=>{const ac=A(id),sg=ac&&ac.ty=='client'?-1:1,eff=x=>(x.t==id?x.b:0)-(x.f==id?x.a:0),mine=(a,b)=>anTx(a,b).filter(x=>x.f==id||x.t==id);
+  return[anM1('i','⬇️ إجمالي الداخل','#4cd48a',(a,b)=>r2(mine(a,b).reduce((s,x)=>s+(x.t==id?x.b:0),0))),anM1('o','⬆️ إجمالي الخارج','#ff6b6b',(a,b)=>r2(mine(a,b).reduce((s,x)=>s+(x.f==id?x.a:0),0))),anM1('c','↕️ صافي الحركة','#2bb5bd',(a,b)=>r2(sg*mine(a,b).reduce((s,x)=>s+eff(x),0))),anM1('p','💚 العمولات / الأرباح','#4cd48a',(a,b)=>r2(mine(a,b).reduce((s,x)=>s+(x.p||0),0))),anM1('n','🔢 عدد العمليات','#93a7a6',(a,b)=>mine(a,b).length,{n:1}),anM1('b','💼 الرصيد آخر الفترة','#e8870e',(a,b)=>r2(sg*(ac.bal-S.tx.filter(x=>x.d>b).reduce((s,x)=>s+eff(x),0))))]},
  pg:ids=>{const I=new Set(ids),R=(a,b)=>anTx(a,b).filter(x=>(x.f&&I.has(x.f))||(x.t&&I.has(x.t))),inn=(a,b)=>R(a,b).reduce((s,x)=>s+(x.t&&I.has(x.t)?x.b||0:0),0),out=(a,b)=>R(a,b).reduce((s,x)=>s+(x.f&&I.has(x.f)?x.a||0:0),0),
   pl=(a,b)=>{const ks=new Set(R(a,b).map(x=>x.g||x.id));let p=0,l=0;S.tx.forEach(y=>{if(y.p&&ks.has(y.g||y.id)){if(y.p>0)p+=y.p;else l-=y.p}});return[r2(p),r2(l)]};
   return[anM1('i','⬇️ إجمالي الداخل','#4cd48a',(a,b)=>r2(inn(a,b))),anM1('o','⬆️ إجمالي الخارج','#ff6b6b',(a,b)=>r2(out(a,b))),anM1('n','⚖️ المتبقي (الداخل − الخارج)','#2bb5bd',(a,b)=>r2(inn(a,b)-out(a,b))),anM1('p','💚 إجمالي الربح','#4cd48a',(a,b)=>pl(a,b)[0]),anM1('l','🔻 إجمالي الخسارة','#ff6b6b',(a,b)=>pl(a,b)[1],{bad:1}),anM1('c','🔢 عدد العمليات','#93a7a6',(a,b)=>R(a,b).length,{n:1})]},
@@ -1104,7 +1070,7 @@ function saveA(id,ty){const n=$('an').value.trim();if(!n)return alert('اكتب 
  if(ty=='machine'){a.grp=$('ag').value;a.agent=$('aa').value;a.neg=$('ne').checked}
  if(ty=='wallet'||ty=='insta'){a.kind=$('ak').value;a.no=$('ao').value;a.dl=+$('ad').value||0;a.ml=+$('am2').value||0;a.fee=+$('afe').value||0;const u=+$('au').value;if(u)a.u0={m:ymd().slice(0,7),v:u};else delete a.u0}if(!id)S.acc.push(a);closeSh();render()}
 function detail(id){const a=A(id),T=TY[a.ty],w=a.ty=='wallet'||a.ty=='insta';
- sheet(ico(a,1)+' '+a.name,`<div class=tot style="background:${a.col||T.c}"><small>${a.ty=='client'?(a.bal>0?'عليه — هتاخد منه':a.bal<0?'له — هتدفع له':'متسدد ✓'):'الرصيد'}</small><h1>${fmt(a.ty=='client'?Math.abs(a.bal):a.bal)} ج</h1></div>${noH(a,1)}${anote(a)}${w?limBar(a):''}${tags(a)}${accPerBox(id)}
+ sheet(ico(a,1)+' '+a.name,`<div class=tot style="background:${a.col||T.c}"><small>الرصيد${a.ty=='client'?(a.bal>0?' (دين عليه)':a.bal<0?' (دين عليا)':''):''}</small><h1>${fmt(a.ty=='client'?-a.bal:a.bal)} ج</h1></div>${noH(a,1)}${anote(a)}${w?limBar(a):''}${tags(a)}${accPerBox(id)}
  <div class=row2><button class="btn g" onclick="xfer('t',${id})">استلام منه</button><button class="btn g" onclick="xfer('t',0,${id})">تحويل إليه</button>
  <button class="btn g" onclick="settle(${id})">⚖️ تسوية ومطابقة</button>${w?`<button class="btn g" onclick="xfer('a',${id})">سحب ATM</button><button class="btn g" onclick="callDone(${id},1)">📞 سجلت مكالمة</button><button class="btn g" onclick="pend(${id})">⏳ معلّقات</button>`:''}
  <button class="btn g" onclick="noteEdit(${id})">📝 ملاحظة</button><button class="btn g" onclick="editBal(${id})">✏️ تعديل الرصيد 🔒</button><button class="btn g" onclick="accForm(${id},'${a.ty}')">تعديل</button>${a.ty=='client'?`<button class="btn g" onclick="rmUI(${id})">🔔 تذكير بالمستحق${a.rm&&a.rm.on?' ✅':''}</button><button class="btn g" onclick="wa(${id})">📲 كشف حساب واتساب</button>`:''}<button class="btn d" onclick="delA(${id})">حذف</button></div>
@@ -1282,7 +1248,7 @@ function pgRep0(c,ids,rf){const[a,b]=perOf(c),I=new Set(ids),R=S.tx.filter(x=>x.
  let adj=0;if(c=='sec_machine')S.tx.forEach(y=>{if(y.k=='adj'&&y.s=='machine'&&y.p&&y.d>=a&&y.d<=b&&!ks.has(y.g||y.id)){adj+=y.p;if(y.p>0)pf+=y.p;else ls-=y.p}});
  const cl=ids.length&&ids.every(i=>(A(i)||{}).ty=='client'),bal=ids.reduce((t,i)=>t+((A(i)||{}).bal||0),0),net=inn-out,prev=r2(bal-S.tx.filter(x=>x.d>=a).reduce((t,x)=>t+((x.t&&I.has(x.t))?(x.b||0):0)-((x.f&&I.has(x.f))?(x.a||0):0),0)),
  cell=(t,v,k)=>`<div style="background:var(--cd2);border-radius:12px;padding:10px;text-align:center"><small>${t}</small><div class="${k||''}" style="font-size:19px;font-weight:800">${fmt(v)}</div></div>`;
- return `<div class=tl style="margin:10px 0"><b>📊 تقرير هذه الصفحة</b>${perBox(c,rf)}<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">${cell('⬇️ إجمالي الداخل',inn,'up')}${cell('⬆️ إجمالي الخارج',out,'dn')}${cell('⚖️ المتبقي (الداخل − الخارج)',net,net>=0?'up':'dn')}${cl?`<div style="grid-column:1/-1;background:var(--cd2);border-radius:12px;padding:10px;text-align:center"><small>📜 رصيد سابق (قبل ${a==b?'بداية اليوم':'بداية الفترة'})</small><div style="font-size:19px;font-weight:800">${fmt(prev)}</div><small style="color:var(--mu)">+ = دين عليهم • − = دين عليا</small></div>`:''}${cell(cl?'💼 الرصيد (+ = دين عليهم)':'💼 الرصيد الحالي',bal)}${cell('💚 إجمالي الربح',pf,'up')}${cell('🔻 إجمالي الخسارة',ls,'dn')}</div><small>${R.length} عملية في الفترة</small>${adj?`<small style="display:block;color:var(--mu)">⚖️ يشمل ${adj>0?'+':'−'}${fmt(Math.abs(adj))} من تسويات الدرج المضافة لمكسب المكن</small>`:''}</div>`}
+ return `<div class=tl style="margin:10px 0"><b>📊 تقرير هذه الصفحة</b>${perBox(c,rf)}${cl&&sdCur()!=0?supView(supNet(R,I,prev),sdCur(),ids.length>1,1):`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">${cell('⬇️ إجمالي الداخل',inn,'up')}${cell('⬆️ إجمالي الخارج',out,'dn')}${cell('⚖️ المتبقي (الداخل − الخارج)',net,net>=0?'up':'dn')}${cl?`<div style="grid-column:1/-1;background:var(--cd2);border-radius:12px;padding:10px;text-align:center"><small>📜 رصيد سابق (قبل ${a==b?'بداية اليوم':'بداية الفترة'})</small><div style="font-size:19px;font-weight:800">${fmt(prev)}</div><small style="color:var(--mu)">+ = دين عليهم • − = دين عليا</small></div>`:''}${cell(cl?'💼 الرصيد (+ = دين عليهم)':'💼 الرصيد الحالي',bal)}${cell('💚 إجمالي الربح',pf,'up')}${cell('🔻 إجمالي الخسارة',ls,'dn')}</div>`}<small>${R.length} عملية في الفترة</small>${adj?`<small style="display:block;color:var(--mu)">⚖️ يشمل ${adj>0?'+':'−'}${fmt(Math.abs(adj))} من تسويات الدرج المضافة لمكسب المكن</small>`:''}</div>`}
 function accSalesRep0(sl){const[a,b]=perOf('acc'),L=sl.filter(x=>x.d>=a&&x.d<=b),t=L.reduce((q,x)=>q+(x.b||0),0),p=L.reduce((q,x)=>q+(x.p||0),0);
  return `<b style="display:block;margin:16px 0 6px">📊 تقارير الاكسسوار</b>${perBox('acc')}<div class=tl style="margin:8px 0"><div class=row2><div><small>🛒 المبيعات</small><div class=tv>${fmt(t)}</div></div><div><small>💚 الربح</small><div class="tv up">${fmt(p)}</div></div></div><small>${L.length} عملية بيع</small></div><b style="display:block;margin:10px 0 6px">🏆 تقرير الأصناف (الأسماء المتشابهة = صنف واحد)</b>${simRep(L)}<b style="display:block;margin:14px 0 6px">🔑 تقرير بالكلمات المفتاحية</b>${kwRep(L)}`}
 /* ===== تعديل 27: تذكير الموردين + توقيت تسوية المكن + أيقونة إشعارات عائمة ===== */
@@ -1386,7 +1352,7 @@ function accPer(id){V.dp=V.dp||{};const ls=lastSet(id);let p=V.dp[id];if(!p)p=V.
  const inP=x=>p.m=='all'?true:p.m=='day'?x.d==p.d:(ls&&(x.ts?x.ts>=ls.ts:x.d>ls.d));
  const mine=S.tx.filter(x=>(x.f==id||x.t==id)&&inP(x)),seen={},L=[];mine.forEach(x=>{const k=x.g||('i'+x.id);if(!seen[k]){seen[k]=1;L.push(x)}});
  let inn=0,out=0,ni=0,no=0,cm=0,innc=0,outc=0;L.forEach(x=>{if(x.k=='x'){const d=drOf(x),R=getRaw(x),M=R?R.M:(x.f==id?x.a:x.b),MC=R?wcom(R):M;if(d=='in'){inn+=M;innc+=MC;ni++}else if(d=='out'){out+=M;outc+=MC;no++}}if(x.k!='adj'&&x.k!='set'&&x.k!='cap'&&x.p)cm+=x.p});
- return{p,ls,L:mine.filter((x,i,ar)=>true),inn:r2(inn),out:r2(out),innc:r2(innc),outc:r2(outc),ni,no,cm:r2(cm),sup:(A(id)&&A(id).ty=='client')?supAgg(id,inP,x=>p.m=='day'&&x.d>p.d):null}}
+ return{p,ls,L:mine.filter((x,i,ar)=>true),inn:r2(inn),out:r2(out),innc:r2(innc),outc:r2(outc),ni,no,cm:r2(cm)}}
 function accPerBox0(id){const q=accPer(id),p=q.p,b=(m,l)=>`<b class="${p.m==m?'on':''}" onclick="V.dp[${id}].m='${m}';V.dp[${id}].auto=0;detail(${id})">${l}</b>`;
  return `<div class=tl style="margin-top:10px;border-color:#00838fbb"><div class=seg>${q.ls?b('set','منذ آخر تسوية'):''}${b('day','يوم')}${b('all','كل الأوقات')}</div>${p.m=='day'?`<input type=date value="${p.d}" onchange="V.dp[${id}].d=this.value||'${ymd()}';detail(${id})">`:''}<small style="display:block;margin:6px 0">${p.m=='set'?'منذ آخر تسوية: '+q.ls.d+' '+hm(q.ls.ts):p.m=='day'?'يوم '+p.d:q.ls?'كل الأوقات (آخر تسوية '+q.ls.d+' '+hm(q.ls.ts)+')':'كل الأوقات (لا توجد تسوية سابقة)'}</small>
  ${accSumHtml(q,id)}</div>`}
@@ -1431,7 +1397,7 @@ function periodTile(a,b,r){const m=ymd().slice(0,7),s0=r=='m'?msGet(m):totAt(add
  return `<div class=tl style="border-color:#00838fbb;margin-bottom:10px"><small>📅 شغل الفترة (${a==b?a:a+' ← '+b})</small><div class=tv onclick="repDet('work','${a}','${b}')" style="cursor:pointer;color:${W.w>=0?'var(--gr)':'var(--rd)'}">${fmt(W.w)} ج ›</div><div class=rw onclick="repDet('sales','${a}','${b}')" style="cursor:pointer"><small>🛒 مبيعات الاكسسوار ›</small><b>${fmt(W.sales)}</b></div><div class=rw onclick="repDet('pf','${a}','${b}')" style="cursor:pointer"><small>💚 أرباح الكاش والمكن ›</small><b class="${W.pf>=0?'up':'dn'}">${fmt(W.pf)}</b></div><div class=rw onclick="repDet('exp','${a}','${b}')" style="cursor:pointer"><small>💸 مصاريف الفترة ›</small><b class=dn>${fmt(W.exp)}</b></div><div class=rw><small>🧮 صافي الشغل بعد المصاريف</small><b class="${W.net>=0?'up':'dn'}">${fmt(W.net)}</b></div><div class=row2 style="margin-top:8px"><div><small>الإجمالي أول الفترة</small><div class=tv>${fmt(s0)}</div></div><div><small>الإجمالي آخر الفترة</small><div class=tv>${fmt(e)}</div></div></div>${cn?`<div class=rw><small>🏦 رأس مال (إدخال/إخراج) — ليس شغلًا</small><b style="direction:ltr">${sgn(cn)}</b></div>`:''}${r=='m'?`<button class="btn g" style="margin-top:8px;padding:8px" onclick="msOpen()">📅 فتح / تعديل بداية الشهر</button>`:''}</div>`}
 function expRep0(a,b){const L=S.tx.filter(x=>x.k=='exp'&&x.d>=a&&x.d<=b),tot=L.reduce((s,x)=>s+x.a,0),g={},m=ymd().slice(0,7),cur=S.tx.filter(x=>x.k=='exp'&&x.d.startsWith(m)).reduce((s,x)=>s+x.a,0),H2=S.expHist||{};L.forEach(x=>g[x.nm]=(g[x.nm]||0)+x.a);
  return `<b style="display:block;margin:16px 0 8px">💸 تقرير المصروفات (منفصل)</b><div class=tl style="border-color:#c0392baa;margin-bottom:10px"><small onclick="repDet('exp','${a}','${b}')">إجمالي المصروفات في الفترة (${a==b?a:a+' ← '+b}) ›</small><div class=tv onclick="repDet('exp','${a}','${b}')" style="cursor:pointer;color:var(--rd)">${fmt(tot)} ج</div><small>${L.length} مصروف</small><div class=rw><small>🗓 مصروفات الشهر الحالي (بتتصفّر أول كل شهر تلقائيًا)</small><b class=dn>${fmt(cur)}</b></div></div><details class=dt open><summary>تفاصيل المصروفات</summary>${Object.entries(g).sort((x,y)=>y[1]-x[1]).map(q=>`<div class=rw><span>${esc(q[0])}</span><b>${fmt(q[1])}</b></div>`).join('')}<div style="margin-top:8px">${L.map(row).join('')||'<div class=empty>لا توجد مصروفات في هذه الفترة</div>'}</div></details>${Object.keys(H2).length?`<details class=dt><summary>🗂 الشهور السابقة (بعد التصفير)</summary>${Object.keys(H2).sort().reverse().map(k=>`<div class=rw><span>${k}</span><b>${fmt(H2[k])}</b></div>`).join('')}</details>`:''}`}
-function drRep0(a,b){const q={in:{s:0,n:0,c:0},out:{s:0,n:0,c:0}},sc={};grp(a,b).filter(x=>x.k=='x').forEach(x=>{const d=drOf(x),R=getRaw(x);if(!d||!R)return;const cw=(supDir(x)=='in')?r2(R.M-R.pr):wcom(R);q[d].s+=R.M;q[d].c+=cw;q[d].n++;const k=secName(x)+' — '+(d=='in'?'استلام':'تحويل');sc[k]=sc[k]||{s:0,n:0,c:0,d:d,sec:secName(x)};sc[k].s+=R.M;sc[k].c+=cw;sc[k].n++});
+function drRep0(a,b){const q={in:{s:0,n:0,c:0},out:{s:0,n:0,c:0}},sc={};grp(a,b).filter(x=>x.k=='x').forEach(x=>{const d=drOf(x),R=getRaw(x);if(!d||!R)return;q[d].s+=R.M;q[d].c+=wcom(R);q[d].n++;const k=secName(x)+' — '+(d=='in'?'استلام':'تحويل');sc[k]=sc[k]||{s:0,n:0,c:0,d:d,sec:secName(x)};sc[k].s+=R.M;sc[k].c+=wcom(R);sc[k].n++});
  const bx=(l,o,c,k)=>`<div class=tl onclick="repDet('${k}','${a}','${b}')" style="border-color:${c}aa;cursor:pointer"><small>${l} • ${o.n} عملية ›</small><div class=tv>${fmt(o.s)} ج</div><small style="display:block;margin-top:2px">بالعمولة: <b style="color:var(--tx)">${fmt(o.c)} ج</b></small></div>`;
  return `<b style="display:block;margin:16px 0 8px">📥📤 الاستلام والتحويل (بمبلغ العملية الأصلي + بالعمولة)</b><div class=tg>${bx('📥 إجمالي الاستلام',q.in,'#4cd48a','in')}${bx('📤 إجمالي التحويل',q.out,'#ff6b6b','out')}</div>${Object.keys(sc).length?`<details class=dt><summary>حسب السكشن</summary>${Object.entries(sc).map(e=>`<div class=rw onclick="repDet('${e[1].d}:${e[1].sec}','${a}','${b}')" style="cursor:pointer"><span>${e[0]} (${e[1].n}) ›</span><b>${fmt(e[1].s)} <small style="color:var(--mu);font-weight:400">• بالعمولة ${fmt(e[1].c)}</small></b></div>`).join('')}</details>`:''}`}
 function logPg(){const L=V.lf=V.lf||{d1:'',d2:'',a:'',t:'',m1:'',m2:'',t1:'',t2:'',q:''},has=v=>v!==''&&v!=null,
