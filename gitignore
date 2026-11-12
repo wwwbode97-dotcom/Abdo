@@ -1,0 +1,6 @@
+# لا ترفع أي نسخ احتياطية أو بيانات على GitHub
+backup*.json
+*.backup
+ledger*.json
+db*.json
+*.bak
