@@ -327,6 +327,25 @@ input#am.amg,input#am.amr{border-radius:14px}
 .qx.qd4 .qfn,.qx.qd4 .qfs{display:none}
 .qx>.qkp{height:calc(184px*var(--qs-kp,1) + 24px)!important;grid-auto-rows:calc(46px*var(--qs-kp,1))!important}.qx .qkp span{height:calc(46px*var(--qs-kp,1))!important;font-size:calc(24px*var(--qs-kp,1))!important}
 </style>
+<style>/* تعديل: ملخص حساب العميل/المورد — 4 أشكال */
+.sdc{background:var(--cd2);border:1px solid var(--ln);border-radius:14px;padding:10px 12px;margin-top:8px}
+.sdh{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--mu)}.sdh b{color:var(--tx);font-size:14px}
+.sdb{font-size:26px;font-weight:800;direction:ltr;text-align:right;margin:2px 0 6px}
+.sdg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sdm{border-radius:10px;padding:6px 4px;font-size:12px;color:var(--mu);text-align:center;background:var(--cd);border:1px solid var(--ln)}
+.sdm b{display:block;font-size:17px;font-weight:800;direction:ltr;color:var(--tx)}
+.sdm.ls{background:rgba(255,107,107,.13);border-color:rgba(255,107,107,.4)}.sdm.ls b{color:#ff6b6b}
+.sdm.pr{background:rgba(76,212,138,.13);border-color:rgba(76,212,138,.4)}.sdm.pr b{color:#4cd48a}
+table.sdt{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.sdt th{font-weight:400;color:var(--mu);font-size:11px;text-align:center;padding:3px 2px}
+.sdt td{padding:8px 2px;text-align:center;border-top:1px solid var(--ln);direction:ltr;font-weight:700}
+.sdt td:first-child{text-align:right;direction:rtl;font-weight:700}.sdt td small{display:block;font-weight:400;color:var(--mu);font-size:11px}
+.sdt tr.tt td{font-size:14px}
+.sds{font-size:14px;line-height:2}.sds b{font-weight:800}
+.sdhero{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.sdhero div{background:var(--cd2);border:1px solid var(--ln);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;color:var(--mu)}
+.sdhero b{display:block;font-size:17px;font-weight:800;direction:ltr;margin-top:2px;color:var(--tx)}.sdhero b.up{color:#4cd48a}.sdhero b.dn{color:#ff6b6b}
+</style>
 </head>
 <body>
 <div id="gate"><div class="gl">📒</div><h1>دفتر الحسابات</h1><p>سجّل الدخول بحساب جوجل. بياناتك بتتحفظ على موبايلك وعلى جوجل درايف بتاعك فقط.</p>
@@ -398,16 +417,35 @@ function qFt(v,f,t,pf){const p=$('qft');if(!p||!f||!t)return;
  nm=a=>a.ty=='drawer'?'الدرج':esc(a.name);
  p.innerHTML=`<div class=qfr>${box(f,1,v.a,r2(f.bal-v.a))}<i class=qfa>←</i>${box(t,0,v.b,r2(t.bal+v.b))}</div><div class=\"qpb ${ng?'neg':''}\">${pt||'اكتب المبلغ لعرض الربح'}</div><div class=qmt><div><small>خارج من ${nm(f)}</small><b dir=ltr style=\"color:#f08a8a\">${ok?'−'+fmt(v.a):'—'}</b></div><div><small>داخل ${t.ty=='drawer'?'للدرج':'إلى '+esc(t.name)}</small><b dir=ltr style=\"color:#6fd49a\">${ok?'+'+fmt(v.b):'—'}</b></div><div><small>${pf<0?'الخسارة':'الربح'}</small><b dir=ltr style=\"color:${ng?'#f08a8a':'#6fd49a'}\">${ok?(pf<0?'−':'+')+fmt(Math.abs(pf)):'—'}</b></div></div>`;
  const q3=$('qpf3');if(q3){q3.textContent=pt;q3.classList.toggle('neg',ng)}}
-function qdInit(){const x=document.querySelector('#sh .qx');if(!x||x.querySelector('#qft'))return;const bx=x.querySelector('.qbox');if(!bx)return;x.classList.add('qd'+qdCur());qdApply(x);
+/* تعديل: فاصلة الآلاف أثناء كتابة المبلغ — القيمة الحقيقية (value) بتفضل أرقام صافية والمعروض بس هو المنسّق */
+const fmtTyp=r=>{r=String(r||'');const i=r.indexOf('.'),ip=i<0?r:r.slice(0,i);return ip.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(i<0?'':r.slice(i))};
+function qdAmt(){const am=$('am');if(!am||am._fm)return;try{const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');let raw=String(am.value||'');const show=()=>d.set.call(am,fmtTyp(raw));Object.defineProperty(am,'value',{get(){return raw},set(v){raw=String(v==null?'':v);show()},configurable:true});am._fm=1;show()}catch(e){}}
+function qdInit(){const x=document.querySelector('#sh .qx');if(!x||x.querySelector('#qft'))return;const bx=x.querySelector('.qbox');if(!bx)return;x.classList.add('qd'+qdCur());qdApply(x);qdAmt();
  const q3=document.createElement('small');q3.id='qpf3';q3.className='qpf3';bx.insertBefore(q3,bx.querySelector('#smr'));
  const p=document.createElement('div');p.id='qft';p.className='qft';bx.after(p);
  showSum();const pn=document.querySelector('#sh .pn');if(pn)pn.scrollTop=0}
 const _xferQ0=xferQ;xferQ=function(){const r=_xferQ0.apply(this,arguments);try{qdInit()}catch(e){}return r};
 const _qSum0=qSum;qSum=function(e,v,f,t,pf){const r=_qSum0.apply(this,arguments);try{qFt(v,f,t,pf)}catch(x){}return r};
 function qsSetHtml(){const q=Object.assign({amt:100,dr:100,wl:100,pf:100,kp:100},S.qs||{}),P=[['amt','خانة المبلغ'],['dr','مربع الدرج'],['wl','مربع المحفظة'],['pf','الربح (الشريط / الخانات)'],['kp','لوحة الأرقام']],op=(v,t,c)=>`<option value=${v} ${c==v?'selected':''}>${t}</option>`;
- return `<b style="display:block;margin:16px 0 4px">📱 شاشة الاستلام / التحويل لعميل</b><label>شكل مربعات من/إلى</label><select id=qs_d>${QDL.map(d=>op(d,QDN[d],qdCur())).join('')}</select>${P.map(([k,n])=>`<label>${n} <b id=qv_${k}>${q[k]}%</b></label><input type=range id=qs_${k} min=60 max=150 step=5 value="${q[k]}" style="height:30px;padding:0" oninput="$('qv_${k}').textContent=this.value+'%'">`).join('')}<button class="btn g" onclick="qsReset()">رجوع للأحجام الأصلية</button><b style="display:block;margin:16px 0 4px">📊 عرض ليمت المحافظ</b><select id=qs_l>${op('rem','المتبقي فقط',limMode())}${op('both','المستهلك والمتبقي',limMode())}${op('used','المستهلك فقط',limMode())}</select>`}
+ return `<b style="display:block;margin:16px 0 4px">📱 شاشة الاستلام / التحويل لعميل</b><label>شكل مربعات من/إلى</label><select id=qs_d>${QDL.map(d=>op(d,QDN[d],qdCur())).join('')}</select>${P.map(([k,n])=>`<label>${n} <b id=qv_${k}>${q[k]}%</b></label><input type=range id=qs_${k} min=60 max=150 step=5 value="${q[k]}" style="height:30px;padding:0" oninput="$('qv_${k}').textContent=this.value+'%'">`).join('')}<button class="btn g" onclick="qsReset()">رجوع للأحجام الأصلية</button><b style="display:block;margin:16px 0 4px">🧾 صفحة حساب العميل / المورد</b><label>شكل الملخص</label><select id=qs_s>${[[1,'كارت لكل اتجاه'],[2,'جدول واحد'],[3,'جمل بسيطة'],[4,'ملخص فوق والتفاصيل تحته'],[0,'الشكل القديم']].map(([v,t])=>op(v,t,sdCur())).join('')}</select><b style="display:block;margin:16px 0 4px">📊 عرض ليمت المحافظ</b><select id=qs_l>${op('rem','المتبقي فقط',limMode())}${op('both','المستهلك والمتبقي',limMode())}${op('used','المستهلك فقط',limMode())}</select>`}
 function qsReset(){['amt','dr','wl','pf','kp'].forEach(k=>{$('qs_'+k).value=100;$('qv_'+k).textContent='100%'})}
-function qsSave(){if($('qs_d'))S.qd=+$('qs_d').value;if($('qs_amt')){S.qs={};['amt','dr','wl','pf','kp'].forEach(k=>{S.qs[k]=+$('qs_'+k).value||100})}if($('qs_l'))S.lm=$('qs_l').value}
+function qsSave(){if($('qs_d'))S.qd=+$('qs_d').value;if($('qs_amt')){S.qs={};['amt','dr','wl','pf','kp'].forEach(k=>{S.qs[k]=+$('qs_'+k).value||100})}if($('qs_l'))S.lm=$('qs_l').value;if($('qs_s'))S.sd=+$('qs_s').value}
+/* تعديل: ملخص حساب العميل/المورد (S.sd: 0 القديم، 1 كارت، 2 جدول، 3 جمل، 4 ملخص+تفاصيل) */
+const nO=n=>n==1?'عملية':n==2?'عمليتين':n>=3&&n<=10?n+' عمليات':n+' عملية';
+const sdCur=()=>[0,1,2,3,4].includes(S.sd)?S.sd:1;
+const accSumOld=q=>`<div class=row2><div><small>📥 استلام (${q.ni})</small><div class="tv up">${fmt(q.inn)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.innc)}</b></small></div><div><small>📤 تحويل (${q.no})</small><div class="tv dn">${fmt(q.out)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.outc)}</b></small></div></div><div class=rw><small>💰 العمولات / الأرباح</small><b class="${q.cm>=0?'up':'dn'}">${fmt(q.cm)}</b></div>`;
+function accSumHtml(q,id){const m=sdCur();if(m==0)return accSumOld(q);
+ const a=A(id),cl=a&&a.ty=='client',LO=cl?'حوّلت له':'تحويل',LI=cl?'استلمت منه':'استلام',po=r2(q.outc-q.out),pi=r2(q.innc-q.inn),tp=r2(po+pi),oth=r2(q.cm-tp),
+ sg=x=>x>0?'+'+fmt(x):x<0?'−'+fmt(-x):'0',cc=x=>x>0?'up':x<0?'dn':'',
+ pl=x=>x>0?'ربح':x<0?'خسارة':'ربح / خسارة',tl=x=>x>0?'الإجمالي بعد الربح':x<0?'الإجمالي بعد الخسارة':'الإجمالي',
+ D=[{l:LO,n:q.no,m:q.out,p:po,t:q.outc},{l:LI,n:q.ni,m:q.inn,p:pi,t:q.innc}],
+ ex=Math.abs(oth)>.5?`<div class=rw><small>رسوم / عمولات أخرى مسجلة</small><b class="${cc(oth)}" dir=ltr>${sg(oth)}</b></div>`:'';
+ let h='';
+ if(m==1)h=D.map(d=>`<div class=sdc><div class=sdh><b>${d.l}</b><span>${nO(d.n)}</span></div><div class=sdb>${fmt(d.m)}</div><div class=sdg><div class="sdm ${d.p<0?'ls':d.p>0?'pr':''}">${pl(d.p)}<b>${sg(d.p)}</b></div><div class="sdm">${tl(d.p)}<b>${fmt(d.t)}</b></div></div></div>`).join('')+`<div class=sdc style="text-align:center;font-size:13px">ربحك الكلي: <b class="${cc(tp)}" dir=ltr>${sg(tp)}</b></div>`;
+ else if(m==2)h=`<div class=sdc><table class=sdt><tr><th></th><th>المبلغ</th><th>ربح / خسارة</th><th>الإجمالي</th></tr>${D.map(d=>`<tr><td>${d.l}<small>${nO(d.n)}</small></td><td>${fmt(d.m)}</td><td class="${cc(d.p)}">${sg(d.p)}</td><td>${fmt(d.t)}</td></tr>`).join('')}<tr class=tt><td>المجموع</td><td>${fmt(r2(q.out+q.inn))}</td><td class="${cc(tp)}">${sg(tp)}</td><td>${fmt(r2(q.outc+q.innc))}</td></tr></table></div>`;
+ else if(m==3)h=D.map(d=>`<div class="sdc sds"><div><b>${d.l}</b> ${fmt(d.m)} ج (${nO(d.n)})</div><div>${d.p<0?`خسرت فيها <b class=dn>${fmt(-d.p)}</b>`:d.p>0?`كسبت فيها <b class=up>${fmt(d.p)}</b>`:'مفيش ربح ولا خسارة'} ← الإجمالي <b>${fmt(d.t)}</b></div></div>`).join('')+`<div class="sdc sds" style="text-align:center">ربحك الكلي من الحساب ده: <b class="${cc(tp)}" dir=ltr>${sg(tp)}</b></div>`;
+ else h=`<div class=sdhero><div>${LO}<b>${fmt(q.out)}</b></div><div>${LI}<b>${fmt(q.inn)}</b></div><div>ربحك الكلي<b class="${cc(tp)}">${sg(tp)}</b></div></div><div class=sdc style="padding:2px 12px">${D.map(d=>`<div class=rw><span>${d.l} — ${pl(d.p)}</span><b class="${cc(d.p)}" dir=ltr>${sg(d.p)}</b></div><div class=rw style="border-top:0;padding-top:0"><span>${tl(d.p)}</span><b dir=ltr>${fmt(d.t)}</b></div>`).join('')}</div>`;
+ return h+(ex?`<div class=sdc style="padding:2px 12px">${ex}</div>`:'')}
 function gcPaint(){document.querySelectorAll('.gx[data-aid]').forEach(el=>{const a=A(+el.dataset.aid),im=a&&a.img;if(!im)return;logoCol(im).then(c=>{if(c)el.style.setProperty('--gc',c)})})}
 let _pt=null;const _render0=render;render=function(){_render0.apply(this,arguments);gcPaint();const t=V.tab;if(t=='exp'&&_pt!='exp'&&typeof expNew=='function'&&expSrcs().length)setTimeout(expNew,0);_pt=t};
 function cardV(a,v){if(v=='list')return card(a);const c=a.ty=='client',bl=`<div class=bal style="color:${!c&&a.bal<0?'#d93a3a':'var(--tx)'}">${fmt(c?-a.bal:a.bal)}${c?`<small>${a.bal>0?'دين عليه':a.bal<0?'دين عليا':''}</small>`:''}</div>`;
@@ -1003,7 +1041,7 @@ function saveA(id,ty){const n=$('an').value.trim();if(!n)return alert('اكتب 
  if(ty=='wallet'||ty=='insta'){a.kind=$('ak').value;a.no=$('ao').value;a.dl=+$('ad').value||0;a.ml=+$('am2').value||0;a.fee=+$('afe').value||0;const u=+$('au').value;if(u)a.u0={m:ymd().slice(0,7),v:u};else delete a.u0}if(!id)S.acc.push(a);closeSh();render()}
 function detail(id){const a=A(id),T=TY[a.ty],w=a.ty=='wallet'||a.ty=='insta';
  sheet(ico(a,1)+' '+a.name,`<div class=tot style="background:${a.col||T.c}"><small>الرصيد${a.ty=='client'?(a.bal>0?' (دين عليه)':a.bal<0?' (دين عليا)':''):''}</small><h1>${fmt(a.ty=='client'?-a.bal:a.bal)} ج</h1></div>${noH(a,1)}${anote(a)}${w?limBar(a):''}${tags(a)}${accPerBox(id)}
- <div class=row2><button class="btn g" onclick="xfer('t',${id})">${a.ty=='client'?'استلام منه':'تحويل منه'}</button><button class="btn g" onclick="xfer('t',0,${id})">تحويل إليه</button>
+ <div class=row2><button class="btn g" onclick="xfer('t',${id})">استلام منه</button><button class="btn g" onclick="xfer('t',0,${id})">تحويل إليه</button>
  <button class="btn g" onclick="settle(${id})">⚖️ تسوية ومطابقة</button>${w?`<button class="btn g" onclick="xfer('a',${id})">سحب ATM</button><button class="btn g" onclick="callDone(${id},1)">📞 سجلت مكالمة</button><button class="btn g" onclick="pend(${id})">⏳ معلّقات</button>`:''}
  <button class="btn g" onclick="noteEdit(${id})">📝 ملاحظة</button><button class="btn g" onclick="editBal(${id})">✏️ تعديل الرصيد 🔒</button><button class="btn g" onclick="accForm(${id},'${a.ty}')">تعديل</button>${a.ty=='client'?`<button class="btn g" onclick="rmUI(${id})">🔔 تذكير بالمستحق${a.rm&&a.rm.on?' ✅':''}</button><button class="btn g" onclick="wa(${id})">📲 كشف حساب واتساب</button>`:''}<button class="btn d" onclick="delA(${id})">حذف</button></div>
  <b style="display:block;margin-top:14px">العمليات في الفترة المحددة</b>${accPerList(id)}${pgRep('det'+id,[id],`detail(${id})`)}`)}
@@ -1287,7 +1325,7 @@ function accPer(id){V.dp=V.dp||{};const ls=lastSet(id);let p=V.dp[id];if(!p)p=V.
  return{p,ls,L:mine.filter((x,i,ar)=>true),inn:r2(inn),out:r2(out),innc:r2(innc),outc:r2(outc),ni,no,cm:r2(cm)}}
 function accPerBox0(id){const q=accPer(id),p=q.p,b=(m,l)=>`<b class="${p.m==m?'on':''}" onclick="V.dp[${id}].m='${m}';V.dp[${id}].auto=0;detail(${id})">${l}</b>`;
  return `<div class=tl style="margin-top:10px;border-color:#00838fbb"><div class=seg>${q.ls?b('set','منذ آخر تسوية'):''}${b('day','يوم')}${b('all','كل الأوقات')}</div>${p.m=='day'?`<input type=date value="${p.d}" onchange="V.dp[${id}].d=this.value||'${ymd()}';detail(${id})">`:''}<small style="display:block;margin:6px 0">${p.m=='set'?'منذ آخر تسوية: '+q.ls.d+' '+hm(q.ls.ts):p.m=='day'?'يوم '+p.d:q.ls?'كل الأوقات (آخر تسوية '+q.ls.d+' '+hm(q.ls.ts)+')':'كل الأوقات (لا توجد تسوية سابقة)'}</small>
- <div class=row2><div><small>📥 استلام (${q.ni})</small><div class="tv up">${fmt(q.inn)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.innc)}</b></small></div><div><small>📤 تحويل (${q.no})</small><div class="tv dn">${fmt(q.out)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.outc)}</b></small></div></div><div class=rw><small>💰 العمولات / الأرباح</small><b class="${q.cm>=0?'up':'dn'}">${fmt(q.cm)}</b></div></div>`}
+ ${accSumHtml(q,id)}</div>`}
 function accPerList(id){const q=accPer(id);return q.L.slice(0,100).map(row).join('')||'<div class=empty>لا توجد عمليات في هذه الفترة</div>'}
 /* ---- تعديل 11 ---- */
 function repDet(kind,a,b){const tx=S.tx.filter(x=>x.d>=a&&x.d<=b),G=grp(a,b),NS=x=>x.k!='adj'&&x.k!='set'&&x.k!='sale';let T='',L=[];const [k0,k1]=String(kind).split(':');
