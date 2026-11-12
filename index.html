@@ -450,12 +450,12 @@ function qdInit(){const x=document.querySelector('#sh .qx');if(!x||x.querySelect
 const _xferQ0=xferQ;xferQ=function(){const r=_xferQ0.apply(this,arguments);try{qdInit()}catch(e){}return r};
 const _qSum0=qSum;qSum=function(e,v,f,t,pf){const r=_qSum0.apply(this,arguments);try{qFt(v,f,t,pf)}catch(x){}return r};
 function qsSetHtml(){const q=Object.assign({amt:100,dr:100,wl:100,pf:100,kp:100},S.qs||{}),P=[['amt','خانة المبلغ'],['dr','مربع الدرج'],['wl','مربع المحفظة'],['pf','الربح (الشريط / الخانات)'],['kp','لوحة الأرقام']],op=(v,t,c)=>`<option value=${v} ${c==v?'selected':''}>${t}</option>`;
- return `<b style="display:block;margin:16px 0 4px">📱 شاشة الاستلام / التحويل لعميل</b><label>شكل مربعات من/إلى</label><select id=qs_d>${QDL.map(d=>op(d,QDN[d],qdCur())).join('')}</select>${P.map(([k,n])=>`<label>${n} <b id=qv_${k}>${q[k]}%</b></label><input type=range id=qs_${k} min=60 max=150 step=5 value="${q[k]}" style="height:30px;padding:0" oninput="$('qv_${k}').textContent=this.value+'%'">`).join('')}<button class="btn g" onclick="qsReset()">رجوع للأحجام الأصلية</button><b style="display:block;margin:16px 0 4px">🧾 صفحة حساب العميل / المورد</b><label>شكل الملخص</label><select id=qs_s>${[[1,'كارت لكل اتجاه'],[2,'جدول واحد'],[3,'جمل بسيطة'],[4,'ملخص فوق والتفاصيل تحته'],[0,'الشكل القديم']].map(([v,t])=>op(v,t,sdCur())).join('')}</select><b style="display:block;margin:16px 0 4px">📊 عرض ليمت المحافظ</b><select id=qs_l>${op('rem','المتبقي فقط',limMode())}${op('both','المستهلك والمتبقي',limMode())}${op('used','المستهلك فقط',limMode())}</select>`}
+ return `<b style="display:block;margin:16px 0 4px">📱 شاشة الاستلام / التحويل لعميل</b><label>شكل مربعات من/إلى</label><select id=qs_d>${QDL.map(d=>op(d,QDN[d],qdCur())).join('')}</select>${P.map(([k,n])=>`<label>${n} <b id=qv_${k}>${q[k]}%</b></label><input type=range id=qs_${k} min=60 max=150 step=5 value="${q[k]}" style="height:30px;padding:0" oninput="$('qv_${k}').textContent=this.value+'%'">`).join('')}<button class="btn g" onclick="qsReset()">رجوع للأحجام الأصلية</button><b style="display:block;margin:16px 0 4px">🧾 صفحة حساب العميل / المورد</b><label>شكل الملخص</label><select id=qs_s>${[[5,'ثلاث خانات مضغوطة (استلام / تحويل / ربح)'],[1,'كارت لكل اتجاه'],[2,'جدول واحد'],[3,'جمل بسيطة'],[4,'ملخص فوق والتفاصيل تحته'],[0,'الشكل القديم']].map(([v,t])=>op(v,t,sdCur())).join('')}</select><b style="display:block;margin:16px 0 4px">📊 عرض ليمت المحافظ</b><select id=qs_l>${op('rem','المتبقي فقط',limMode())}${op('both','المستهلك والمتبقي',limMode())}${op('used','المستهلك فقط',limMode())}</select>`}
 function qsReset(){['amt','dr','wl','pf','kp'].forEach(k=>{$('qs_'+k).value=100;$('qv_'+k).textContent='100%'})}
-function qsSave(){if($('qs_d'))S.qd=+$('qs_d').value;if($('qs_amt')){S.qs={};['amt','dr','wl','pf','kp'].forEach(k=>{S.qs[k]=+$('qs_'+k).value||100})}if($('qs_l'))S.lm=$('qs_l').value;if($('qs_s'))S.sd=+$('qs_s').value}
+function qsSave(){if($('qs_d'))S.qd=+$('qs_d').value;if($('qs_amt')){S.qs={};['amt','dr','wl','pf','kp'].forEach(k=>{S.qs[k]=+$('qs_'+k).value||100})}if($('qs_l'))S.lm=$('qs_l').value;if($('qs_s'))S.sdn=+$('qs_s').value}
 /* تعديل: ملخص حساب العميل/المورد (S.sd: 0 القديم، 1 كارت، 2 جدول، 3 جمل، 4 ملخص+تفاصيل) */
 const nO=n=>n==1?'عملية':n==2?'عمليتين':n>=3&&n<=10?n+' عمليات':n+' عملية';
-const sdCur=()=>[0,1,2,3,4].includes(S.sd)?S.sd:1;
+const sdCur=()=>[0,1,2,3,4,5].includes(S.sdn)?S.sdn:5;
 const accSumOld=q=>`<div class=row2><div><small>📥 استلام (${q.ni})</small><div class="tv up">${fmt(q.inn)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.innc)}</b></small></div><div><small>📤 تحويل (${q.no})</small><div class="tv dn">${fmt(q.out)}</div><small style="color:var(--mu)">بالعمولة <b style="color:var(--tx)">${fmt(q.outc)}</b></small></div></div><div class=rw><small>💰 العمولات / الأرباح</small><b class="${q.cm>=0?'up':'dn'}">${fmt(q.cm)}</b></div>`;
 
 /* ===== تعديل: ملخص/تقرير حساب المورد — الربح/الخسارة بيتخصم جوه كل اتجاه، ومفيش جمع استلام مع تحويل =====
@@ -518,7 +518,16 @@ function supSumHtml(s,id){
  return h}
 function supRep(id){const ac=A(id),[a,b]=rngOf(V.rr||'1',V.rd1,V.rd2),s=supAgg(id,x=>x.d>=a&&x.d<=b,x=>x.d>b),inr=S.tx.filter(x=>x.d>=a&&x.d<=b&&(x.f==id||x.t==id));
  return `<div class=tot><small>${esc(ac.name)} — ${a==b?a:a+' ← '+b}</small><h1>${supHead(s.close)}</h1><small>المتبقي في نهاية الفترة</small></div>`+supSumHtml(s,id)+`<b style="display:block;margin:10px 0 6px">العمليات (${inr.length})</b>`+(inr.slice(0,60).map(row).join('')||'<div class=empty>لا توجد عمليات في هذه الفترة</div>')}
-function accSumHtml(q,id){if(q.sup)return supSumHtml(q.sup,id);const m=sdCur();if(m==0)return accSumOld(q);
+function compactSum(q){const G='#4cd48a',R='#ff6b6b',tp=r2(r2(q.outc-q.out)+r2(q.innc-q.inn)),oth=r2(q.cm-tp),
+ fs=v=>String(v).length>9?15:String(v).length>7?17:19,
+ cell=(l,v,c,b1,b2)=>`<div style="background:${b1};border:1px solid ${b2};border-radius:12px;padding:8px 4px;text-align:center;min-width:0"><div style="font-size:12px;color:${c}">${l}</div><div style="font-size:${fs(v)}px;font-weight:800;direction:ltr;color:${c}">${v}</div></div>`,
+ pc=tp>0?G:tp<0?R:'var(--mu)';
+ return `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">`
+  +cell('استلام · '+q.ni,fmt(q.inn),G,'rgba(76,212,138,.14)','rgba(76,212,138,.4)')
+  +cell('تحويل · '+q.no,fmt(q.out),R,'rgba(255,107,107,.14)','rgba(255,107,107,.4)')
+  +cell(tp<0?'خسارة':tp>0?'ربح':'ربح / خسارة',tp>0?'+'+fmt(tp):tp<0?'−'+fmt(-tp):'0',pc,'var(--cd2)','var(--ln)')+`</div>`
+  +(Math.abs(oth)>.5?`<div style="font-size:12px;color:var(--mu);text-align:center;margin-top:6px">رسوم / عمولات أخرى: <b dir=ltr>${oth>0?'+':'−'}${fmt(Math.abs(oth))}</b></div>`:'')}
+function accSumHtml(q,id){if(q.sup)return supSumHtml(q.sup,id);const m=sdCur();if(m==5)return compactSum(q);if(m==0)return accSumOld(q);
  const a=A(id),cl=a&&a.ty=='client',LO=cl?'حوّلت له':'تحويل',LI=cl?'استلمت منه':'استلام',po=r2(q.outc-q.out),pi=r2(q.innc-q.inn),tp=r2(po+pi),oth=r2(q.cm-tp),
  sg=x=>x>0?'+'+fmt(x):x<0?'−'+fmt(-x):'0',cc=x=>x>0?'up':x<0?'dn':'',
  pl=x=>x>0?'ربح':x<0?'خسارة':'ربح / خسارة',tl=x=>x>0?'الإجمالي بعد الربح':x<0?'الإجمالي بعد الخسارة':'الإجمالي',
