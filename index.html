@@ -1731,8 +1731,15 @@ const API={
   const r=await fetch('https://www.googleapis.com/upload/drive/v3/files'+(id?'/'+id:'')+'?uploadType=multipart&fields=id',{method:id?'PATCH':'POST',headers:Object.assign({'Content-Type':'multipart/related; boundary='+bd},gH()),body:mp});if(!r.ok)throw new Error('put '+r.status);return(await r.json()).id},
  async del(id){await fetch('https://www.googleapis.com/drive/v3/files/'+id,{method:'DELETE',headers:gH()})}};
 function gLoad(){return new Promise((ok,no)=>{if(window.google&&google.accounts&&google.accounts.oauth2)return ok();const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=ok;s.onerror=()=>no(new Error('تعذر تحميل مكتبة جوجل (تأكد من النت)'));document.head.appendChild(s)})}
+async function gHash(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(s||'').trim().toLowerCase()));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
 function gTok(interactive,prompt){return new Promise(async(ok,no)=>{if(GD.tok&&Date.now()<GD.exp-60000)return ok(GD.tok);if(!interactive)return no(new Error('auth'));
- try{await gLoad();const c=google.accounts.oauth2.initTokenClient({client_id:GD.cfg.cid,scope:'https://www.googleapis.com/auth/drive.appdata openid email',callback:r=>{if(r.error)return no(new Error(r.error));GD.tok=r.access_token;GD.exp=Date.now()+(r.expires_in||3600)*1e3;GD.cfg.conn=1;gsave();ok(GD.tok);if(!GD.cfg.hint)fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+r.access_token}}).then(x=>x.json()).then(u=>{if(u&&u.email){GD.cfg.hint=u.email;gsave()}}).catch(()=>{})},error_callback:e=>no(new Error((e&&e.type)||'popup'))});c.requestAccessToken(GD.cfg.hint&&!prompt?{prompt:'',hint:GD.cfg.hint}:{prompt:prompt||''})}catch(e){no(e)}})}
+ try{await gLoad();const c=google.accounts.oauth2.initTokenClient({client_id:GD.cfg.cid,scope:'https://www.googleapis.com/auth/drive.appdata openid email',callback:async r=>{if(r.error)return no(new Error(r.error));
+  try{const u=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+r.access_token}}).then(x=>x.json());const em=(u&&u.email||'').trim().toLowerCase();
+   if(!em)throw new Error('تعذر التحقق من البريد الإلكتروني');
+   const oh=(OWNER_HASH||'').trim().toLowerCase(),bad=(oh&&(await gHash(em))!==oh)||(!oh&&GD.cfg.owner&&em!==GD.cfg.owner.toLowerCase());
+   if(bad){try{google.accounts.oauth2.revoke(r.access_token)}catch(e){}GD.tok=null;GD.cfg.conn=0;gsave();return no(new Error('هذا الحساب غير مصرح له بالدخول'))}
+   GD.cfg.owner=GD.cfg.owner||em;GD.cfg.hint=em}catch(e){if(OWNER_HASH||GD.cfg.owner){try{google.accounts.oauth2.revoke(r.access_token)}catch(_){}return no(e)}}
+  GD.tok=r.access_token;GD.exp=Date.now()+(r.expires_in||3600)*1e3;GD.cfg.conn=1;gsave();ok(GD.tok)},error_callback:e=>no(new Error((e&&e.type)||'popup'))});c.requestAccessToken(GD.cfg.hint&&!prompt?{prompt:'',hint:GD.cfg.hint}:{prompt:prompt||''})}catch(e){no(e)}})}
 const gUpd=f=>+((f.appProperties||{}).upd||0);
 async function gVersions(api,files,body,upd){const vs=files.filter(f=>f.name.startsWith('v-')).sort((a,b)=>b.modifiedTime.localeCompare(a.modifiedTime));
  if(!vs[0]||Date.now()-new Date(vs[0].modifiedTime).getTime()>6*36e5){await api.put('v-'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'.json',body,upd,0)}
@@ -1765,12 +1772,14 @@ function cloudUI(){const ok=location.protocol=='https:'||location.hostname=='loc
  sheet('☁️ جوجل درايف · إصدار 5',(ok?'':'<div class=alert>⚠️ تسجيل الدخول بجوجل لا يعمل إلا لو التطبيق مفتوح من رابط https (بعد رفعه على الاستضافة). الآن مفتوح كملف.</div>')+
  `<p style="color:var(--mu);font-size:13px">بيحفظ نسخة تلقائيًا بعد كل تعديل في مجلد مخفي خاص بالتطبيق على درايفك، وبيحتفظ بآخر 5 نسخ.</p>
  <label>Google Client ID</label><input id=gcid value="${c.cid||''}" placeholder="xxxx.apps.googleusercontent.com" style="direction:ltr">
- ${c.conn?`<p>الحالة: <b>${st}</b>${c.last?'<br><small>آخر مزامنة: '+new Date(c.last).toLocaleString('ar-EG')+'</small>':''}</p><button class=btn onclick="askPin(()=>gSync(true))">🔄 مزامنة الآن</button><button class="btn g" onclick="askPin(()=>gVers())">🕘 النسخ السابقة / استعادة</button><button class="btn g" onclick="gSetCid()">💾 حفظ الـ Client ID</button><button class="btn d" onclick="gDisc()">⏏️ إلغاء الربط</button>`:`<button class=btn onclick="gConnect()">🔗 تسجيل الدخول بحساب جوجل</button>`}`)}
+ ${c.conn?`<p>الحالة: <b>${st}</b>${c.last?'<br><small>آخر مزامنة: '+new Date(c.last).toLocaleString('ar-EG')+'</small>':''}</p><button class=btn onclick="askPin(()=>gSync(true))">🔄 مزامنة الآن</button><button class="btn g" onclick="gCopyHash()">🔒 نسخ بصمة حسابي (OWNER_HASH)</button><button class="btn g" onclick="askPin(()=>gVers())">🕘 النسخ السابقة / استعادة</button><button class="btn g" onclick="gSetCid()">💾 حفظ الـ Client ID</button><button class="btn d" onclick="gDisc()">⏏️ إلغاء الربط</button>`:`<button class=btn onclick="gConnect()">🔗 تسجيل الدخول بحساب جوجل</button>`}`)}
+async function gCopyHash(){if(!GD.cfg.hint)return toast('سجّل الدخول أولًا');const h=await gHash(GD.cfg.hint);copyNo(h);toast('✓ تم نسخ بصمة حسابك — ضعها في OWNER_HASH')}
 function gSetCid(){GD.cfg.cid=($('gcid').value||'').trim();gsave();toast('✓ تم الحفظ')}
 window.addEventListener('online',()=>gSync(false));document.addEventListener('visibilitychange',()=>{if(!document.hidden&&GD.cfg.conn)gSync(false)});
 
 /* ===== بوابة الدخول بحساب جوجل ===== */
 const GCID='';/* ← ضع هنا الـ Client ID بتاعك بعد إنشائه في Google Cloud (انظر README) */
+const OWNER_HASH='';/* ← اختياري: بصمة SHA-256 لإيميلك لقفل الدخول على حسابك من أي جهاز بدون كشف الإيميل */
 if(!GD.cfg.cid&&GCID){GD.cfg.cid=GCID;gsave()}
 function gateShow(){const g=document.getElementById('gate');if(!g)return;const need=location.protocol=='https:'&&!GD.cfg.conn;g.classList.toggle('on',need);const i=document.getElementById('gcid0');if(i)i.style.display=GD.cfg.cid?'none':''}
 async function gateLogin(){const e=document.getElementById('gerr'),i=document.getElementById('gcid0');e.textContent='';if(i&&i.value.trim())GD.cfg.cid=i.value.trim();if(!GD.cfg.cid){e.textContent='اكتب الـ Client ID أولًا';if(i)i.style.display='';return}gsave();
