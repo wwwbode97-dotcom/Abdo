@@ -1014,32 +1014,46 @@ function qSum(e,v,f,t,pf){const lb=$('qpl');if(lb)lb.textContent=pf<0?'خسار�
  e.innerHTML=v.M>0&&f&&t?`<div class=qr><span>${ico(t,1)} يدخل إلى <b>${esc(t.name)}</b></span><b class=g style="direction:ltr">+${fmt(v.b)}</b></div><div class=qr><span>${ico(f,1)} يخرج من <b>${esc(f.name)}</b></span><b class=o style="direction:ltr">−${fmt(v.a)}</b></div>${pf?`<div class=qr><span>${pf<0?'🔻 خسارتك':'💚 ربحك'}</span><b class="${pf<0?'o':'g'}" style="font-size:16px">${fmt(Math.abs(pf))}</b></div>`:''}`:'<div class=qr style="justify-content:center;color:var(--mu)">اكتب المبلغ لعرض الملخص</div>';qStrip()}
 
 /* ===== تعديل 58: سجل وتقرير خاص بسحب ATM ===== */
-var AH={t:'log',r:'7',a:'',b:''};
+var AH={t:'rep',r:'1',a:'',b:''};
 function atmFee(x){return Math.max(0,r2((x.a||0)-(x.b||0)))}
 function atmTxs(a,b){return S.tx.filter(x=>x.k=='x'&&x.d>=a&&x.d<=b&&((getRaw(x)||{}).k=='a')).sort((p,q)=>(q.ts||0)-(p.ts||0))}
 function atmRange(){const r=AH.r;return r=='all'?['2000-01-01',ymd()]:r=='c'?[AH.a||ymd(),AH.b||AH.a||ymd()]:rngOf(r)}
 function atmSet(k,v){AH[k]=v;atmHist()}
 function atmHist(){XON=false;AX=null;QX=null;const[a,b]=atmRange(),L=atmTxs(a,b),
- P=[['اليوم','1'],['7 أيام','7'],['30 يوم','30'],['الشهر','m'],['الكل','all'],['تاريخ','c']];
- sheet('🏧 سجل وتقرير ATM',`<div class=seg><b class="${AH.t=='log'?'on':''}" onclick="atmSet('t','log')">📋 السجل</b><b class="${AH.t=='rep'?'on':''}" onclick="atmSet('t','rep')">📊 التقرير</b></div>
- <div class=chips style="margin:8px 0;flex-wrap:wrap;overflow:visible">${P.map(q=>`<span class="${AH.r==q[1]?'on':''}" onclick="atmSet('r','${q[1]}')">${q[0]}</span>`).join('')}</div>
- ${AH.r=='c'?`<div class=row2><div><label>من</label><input type=date value="${AH.a||a}" onchange="atmSet('a',this.value)"></div><div><label>إلى</label><input type=date value="${AH.b||b}" onchange="atmSet('b',this.value)"></div></div>`:`<small style="color:var(--mu)">${a==b?a:(AH.r=='all'?'كل الفترات':a+' ← '+b)}</small>`}
+ P=[['اليوم','1'],['من بداية الشهر','m'],['اختيار مدة','c']];
+ sheet('🏧 تقرير سحب ATM',`<div class=seg><b class="${AH.t=='rep'?'on':''}" onclick="atmSet('t','rep')">📊 التقرير</b><b class="${AH.t=='log'?'on':''}" onclick="atmSet('t','log')">📋 السجل</b></div>
+ <div class=seg style="margin-top:8px">${P.map(q=>`<b class="${AH.r==q[1]?'on':''}" onclick="atmSet('r','${q[1]}')">${q[0]}</b>`).join('')}</div>
+ ${AH.r=='c'?`<div class=row2><div><label>من</label><input type=date value="${AH.a||a}" onchange="atmSet('a',this.value)"></div><div><label>إلى</label><input type=date value="${AH.b||b}" onchange="atmSet('b',this.value)"></div></div>`:`<small style="color:var(--mu);display:block;margin-top:4px">${a==b?a:a+' ← '+b}</small>`}
  ${AH.t=='log'?atmLog(L):atmRep(L)}
  <button class=btn style="margin-top:12px" onclick="xfer('a')">➕ سحب جديد</button>`)}
 function atmLog(L){if(!L.length)return '<div class=empty>لا توجد عمليات سحب ATM في هذه الفترة</div>';
  const tot=L.reduce((s,x)=>s+x.b,0),fe=L.reduce((s,x)=>s+atmFee(x),0);
  return `<div style="display:flex;justify-content:space-between;margin:6px 0 4px;font-size:13px;color:var(--mu)"><span>${L.length} عملية</span><span>مسحوب <b style="color:var(--gr)">${fmt(tot)}</b> • مصاريف <b style="color:var(--rd)">${fmt(fe)}</b></span></div>${L.slice(0,150).map(row).join('')}${L.length>150?`<small style="color:var(--mu)">عرض آخر 150 عملية من ${L.length} — ضيّق الفترة لعرض الباقي</small>`:''}`}
-function atmRep(L){if(!L.length)return '<div class=empty>لا توجد بيانات في هذه الفترة</div>';
- const n=L.length,tot=L.reduce((s,x)=>s+x.b,0),fe=L.reduce((s,x)=>s+atmFee(x),0),mx=L.reduce((m,x)=>x.b>m.b?x:m,L[0]),pc=tot?fe/tot*100:0,
+function atmRep(L){if(!L.length)return '<div class=empty>لا توجد عمليات سحب ATM في هذه الفترة</div>';
+ const n=L.length,tot=L.reduce((s,x)=>s+x.b,0),fe=L.reduce((s,x)=>s+atmFee(x),0),pc=tot?fe/tot*100:0,
  grp=(kf)=>{const m={};L.forEach(x=>{const k=kf(x),o=m[k]=m[k]||{k,n:0,b:0,fe:0};o.n++;o.b+=x.b;o.fe+=atmFee(x)});return Object.values(m)},
  ac=grp(x=>x.f).sort((p,q)=>q.b-p.b),dy=grp(x=>x.d).sort((p,q)=>p.k<q.k?1:-1),dr=grp(x=>x.t).sort((p,q)=>q.b-p.b),
- mxd=Math.max(1,...dy.map(o=>o.b)),
- T=(l,v,c)=>`<div style="background:var(--cd2);border-radius:14px;padding:10px;text-align:center"><small style="color:var(--mu);display:block">${l}</small><b style="font-size:19px;color:${c||'var(--tx)'}">${v}</b></div>`,
- rows=(arr,nm)=>arr.map(o=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--ln);font-size:14px"><span>${nm(o)}<small style="color:var(--mu);display:block">${o.n} عملية • مصاريف ${fmt(o.fe)}</small></span><b style="color:var(--gr)">${fmt(o.b)}</b></div>`).join('');
- return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0">${T('عدد العمليات',n)}${T('إجمالي المسحوب',fmt(tot),'var(--gr)')}${T('إجمالي المصاريف',fmt(fe),'var(--rd)')}${T('متوسط المصاريف',pc.toFixed(2)+'%')}${T('متوسط العملية',fmt(tot/n))}${T('أكبر سحب',fmt(mx.b))}</div>
- <b style="display:block;margin:14px 0 2px">💳 حسب الحساب المسحوب منه</b>${rows(ac,o=>{const q=A(o.k);return q?ico(q,1)+' '+esc(q.name):'—'})}
- <b style="display:block;margin:14px 0 2px">💵 حسب الدرج المستلم</b>${rows(dr,o=>{const q=A(o.k);return q?ico(q,1)+' '+esc(q.name):'—'})}
- <b style="display:block;margin:14px 0 4px">📅 حسب اليوم</b>${dy.slice(0,31).map(o=>`<div style="margin:6px 0;font-size:13px"><div style="display:flex;justify-content:space-between"><span>${o.k} <small style="color:var(--mu)">(${o.n})</small></span><b>${fmt(o.b)} <small style="color:var(--rd)">− ${fmt(o.fe)}</small></b></div><div style="height:7px;border-radius:5px;background:var(--cd2);overflow:hidden"><div style="height:100%;width:${Math.max(3,o.b/mxd*100)}%;background:var(--p)"></div></div></div>`).join('')}`}
+ mxa=Math.max(1,...ac.map(o=>o.b)),mxd=Math.max(1,...dy.map(o=>o.b));
+ return `<div style="background:var(--cd2);border:1px solid var(--ln);border-radius:18px;padding:16px;margin:10px 0">
+  <b style="display:block;margin-bottom:10px;font-size:16px">ملخص عمليات السحب</b>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center">
+   <div style="border-left:1px solid var(--ln);padding-left:10px"><small style="color:var(--mu);display:block">إجمالي المسحوب</small><b style="font-size:24px;color:var(--gr);direction:ltr;display:inline-block">${fmt(tot)} ج</b></div>
+   <div><small style="color:var(--mu);display:block">إجمالي الخسارة</small><b style="font-size:24px;color:var(--rd);direction:ltr;display:inline-block">${fmt(fe)} ج</b></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--ln);font-size:13px;color:var(--mu)"><span>عدد العمليات: <b style="color:var(--tx)">${n}</b></span><span>متوسط الخسارة: <b style="color:var(--tx)">${pc.toFixed(2)}%</b></span></div>
+ </div>
+ <b style="display:block;margin:14px 0 8px">الحسابات المسحوب منها</b>
+ ${ac.map(o=>{const q=A(o.k),w=Math.max(4,Math.round(o.b/mxa*100));return `<div style="background:var(--cd2);border:1px solid var(--ln);border-radius:16px;padding:12px 14px;margin-bottom:8px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+   <div style="min-width:0"><b style="font-size:15px">${q?ico(q,1)+' '+esc(q.name):'—'}</b><small style="display:block;color:var(--mu)">${o.n} عملية</small></div>
+   <div style="text-align:left;white-space:nowrap"><b style="font-size:16px;color:var(--tx);display:block;direction:ltr">${fmt(o.b)} ج</b><small style="color:var(--rd);direction:ltr;display:block">خسارة ${fmt(o.fe)} ج</small></div>
+  </div>
+  <div style="height:7px;border-radius:4px;background:var(--cd);overflow:hidden"><div style="height:100%;width:${w}%;background:var(--p);border-radius:4px"></div></div>
+ </div>`}).join('')}
+ <details class=dt style="margin-top:10px"><summary>تفاصيل إضافية (حسب الدرج واليوم)</summary>
+  <b style="display:block;margin:8px 0 4px">💵 حسب الدرج المستلم</b>${dr.map(o=>{const q=A(o.k);return `<div class=rw><span>${q?ico(q,1)+' '+esc(q.name):'—'} <small>(${o.n})</small></span><b style="color:var(--gr)">${fmt(o.b)}</b></div>`}).join('')}
+  <b style="display:block;margin:10px 0 4px">📅 حسب اليوم</b>${dy.slice(0,31).map(o=>`<div style="margin:6px 0;font-size:13px"><div style="display:flex;justify-content:space-between"><span>${o.k} <small style="color:var(--mu)">(${o.n})</small></span><b>${fmt(o.b)} <small style="color:var(--rd)">− ${fmt(o.fe)}</small></b></div><div style="height:6px;border-radius:4px;background:var(--cd);overflow:hidden"><div style="height:100%;width:${Math.max(3,o.b/mxd*100)}%;background:var(--p)"></div></div></div>`).join('')}
+ </details>`}
 
 /* ===== تعديل 59: صفحة بيع الاكسسوار (لوحة أرقام) + مرتجع + مخزون + باركود + صور ===== */
 var AP={pid:0,nm:'',buy:'',price:'',note:'',fresh:0},PF=null;
@@ -1572,7 +1586,7 @@ function xferA(k,f,t,pre){pre=pre||{};XK='a';XON=true;EID=pre.eid||0;PS=0;CE=0;X
  <div class=exs id=afs><span onclick="aFm('p',1)">1%</span><span onclick="aFm('p',.75)">0.75%</span><span onclick="aFm('v')">مبلغ</span></div><input id=fev type=number inputmode=decimal placeholder="مبلغ مصاريف السحب" oninput="calc()" style="display:none">
  <div class=exs id=atd>${drs.map(a=>`<span data-id=${a.id} onclick="aDst(${a.id})">${esc(a.name)}</span>`).join('')}</div>
  <div class=exk dir=ltr>${'123456789.0'.split('').map(c=>`<span onmousedown="event.preventDefault()" onpointerdown="qkD('${c}')" onpointerup="qkU()" onpointerleave="qkU()">${c}</span>`).join('')}<span onmousedown="event.preventDefault()" onpointerdown="qkD('b')" onpointerup="qkU()" onpointerleave="qkU()">⌫</span></div>
- <div style="display:flex;gap:8px"><button class=qg style="width:56px;height:52px;border-radius:16px" onclick="$('aopt').style.display=''" aria-label="خيارات">⚙️</button><button class=qg style="width:56px;height:52px;border-radius:16px" onclick="atmHist()" aria-label="سجل وتقرير ATM">📋</button><button class=btn style="flex:1;margin:0" onclick="saveX()">${EID?'حفظ التعديل':'حفظ العملية'}</button></div>
+ <div style="display:flex;gap:8px"><button class=qg style="width:56px;height:52px;border-radius:16px" onclick="$('aopt').style.display=''" aria-label="خيارات">⚙️</button><button class=qg style="width:56px;height:52px;border-radius:16px" onclick="AH.t='rep';atmHist()" aria-label="تقرير ATM">📊</button><button class=qg style="width:56px;height:52px;border-radius:16px" onclick="AH.t='log';atmHist()" aria-label="سجل ATM">📋</button><button class=btn style="flex:1;margin:0" onclick="saveX()">${EID?'حفظ التعديل':'حفظ العملية'}</button></div>
  <div id=aopt style="display:none"><button class="btn g" style="margin:0;height:46px;padding:0" onclick="$('aopt').style.display='none'">✓ تم — رجوع</button>${dtBox('dt',pre.ts)}<label>يُضاف إلى قسم</label><select id=ps>${Object.keys(SEC).map(q=>`<option value=${q}>${SEC[q]}</option>`).join('')}</select><label>ملاحظة</label><input id=nt></div></div>`);
  $('ps').value='cash';if(pre.dts){$('dt').value=pre.dts;DTM.dt=pre.dt0}if(pre.nt)$('nt').value=pre.nt;if(pre.M!=null&&pre.M!=='')$('am').value=pre.M;if(AX.m=='v'){$('fev').value=pre.fe}if(pre.ps)$('ps').value=pre.ps;
  aSrc();aMark();calc()}
