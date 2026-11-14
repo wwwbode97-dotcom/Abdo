@@ -1779,7 +1779,7 @@ window.addEventListener('online',()=>gSync(false));document.addEventListener('vi
 
 /* ===== بوابة الدخول بحساب جوجل ===== */
 const GCID='';/* ← ضع هنا الـ Client ID بتاعك بعد إنشائه في Google Cloud (انظر README) */
-const OWNER_HASH='';/* ← اختياري: بصمة SHA-256 لإيميلك لقفل الدخول على حسابك من أي جهاز بدون كشف الإيميل */
+const OWNER_HASH='daa25ad7da4d54922c9f8f044b4a9bfdb1621819a1a8f22be054b57ce4235fac';/* ← اختياري: بصمة SHA-256 لإيميلك لقفل الدخول على حسابك من أي جهاز بدون كشف الإيميل */
 if(!GD.cfg.cid&&GCID){GD.cfg.cid=GCID;gsave()}
 function gateShow(){const g=document.getElementById('gate');if(!g)return;const need=location.protocol=='https:'&&!GD.cfg.conn;g.classList.toggle('on',need);const i=document.getElementById('gcid0');if(i)i.style.display=GD.cfg.cid?'none':''}
 async function gateLogin(){const e=document.getElementById('gerr'),i=document.getElementById('gcid0');e.textContent='';if(i&&i.value.trim())GD.cfg.cid=i.value.trim();if(!GD.cfg.cid){e.textContent='اكتب الـ Client ID أولًا';if(i)i.style.display='';return}gsave();
