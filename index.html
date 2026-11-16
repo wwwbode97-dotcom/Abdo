@@ -1011,7 +1011,7 @@ function xferOld(k,f,t,pre){AX=null;FE_MAN=0;if(k=='a')return xferA(k,f,t,pre);i
 function xferD3(k,f,t,pre){pre=pre||{};FE_MAN=0;XK=k;XON=true;EID=pre.eid||0;PS=k=='a'?0:pre.pr?(pre.pr>0?1:-1):((k=='r'||k=='s')?1:0);CE=(pre.man&&k!='a')?1:0;XD=k=='a'?'out':(pre.dr||(k=='r'?'in':'out'));
  const fv=favGet(k),F=f||(k=='r'?first('drawer'):(k=='t'&&fv[0])||(k=='s'&&mostUsedToday('s'))||(k=='t'&&mostUsedToday('t'))||first('wallet')||first('drawer')),T=t||(k=='a'?first('drawer'):k=='r'?mostTo(first('drawer'),'r'):(k=='t'&&fv[1]&&fv[1]!=F)?fv[1]:first('drawer'));
  const KN=[['t','🔁 تحويل'],['r','📥 استلام'],['s','📤 لعميل'],['a','🏧 ATM']];
- sheet(EID?'✏️ تعديل العملية':'عملية جديدة',
+ sheet((EID?'✏️ تعديل العملية':'🔁 تحويل')+` <i onclick="pgTxRep('${k}')" style="font-style:normal;cursor:pointer;margin-right:8px;font-size:19px" title="تقرير الصفحة">📊</i>`,
  `<div class=d3>
  <input type=file id=cam accept="image/*" hidden onchange="ocr(event)"><input type=file id=gal accept="image/*" hidden onchange="ocr(event)"><input id=vt type=hidden><b id=mb hidden></b><div style="display:none"><b id=dI></b><b id=dO></b></div>
  <div class=d3a><span>المبلغ</span><input id=am class=big type=number inputmode=decimal placeholder="0" oninput="calc()"></div>
