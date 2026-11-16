@@ -200,6 +200,20 @@ nav img,.nvp img{width:26px;height:26px;border-radius:7px;object-fit:cover}
 .bpc .bal{font-size:var(--bf);text-align:start;color:color-mix(in srgb,var(--gc) 55%,#fff)!important}
 .bpb .bal::after,.bpt .bal::after,.bpc .bal::after{content:" ج";font-size:.4em;color:var(--mu);font-weight:600}.bpf .bal::after{content:" ج";font-size:.4em;color:#ffffffcc;font-weight:600}
 .lw{background:color-mix(in srgb,#ffd84d 14%,var(--cd))!important}.cc.lw{border-radius:18px;padding:8px 2px}
+
+/* تصميم صفحة المزيد: المجموعات المنظمة الهادئة */
+.mgh{font-size:13px;font-weight:700;color:var(--mu);margin:14px 6px 6px}
+.mgc{background:var(--cd);border:1px solid var(--ln);border-radius:18px;overflow:hidden;margin-bottom:6px}
+.mgr{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--ln);cursor:pointer}
+.mgr:last-child{border-bottom:0}
+.mgr:active{background:var(--cd2)}
+.mgic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:20px;flex:none}
+.mgtx{flex:1;min-width:0}
+.mgtx b{display:block;font-size:15.5px;font-weight:700;line-height:1.35}
+.mgtx small{display:block;font-size:12px;color:var(--mu);margin-top:1px}
+.mgbd{background:var(--cd2);color:var(--p);border:1px solid var(--ln);border-radius:10px;padding:2px 8px;font-size:12px;font-weight:700}
+.mgch{color:var(--mu);font-size:18px;font-weight:700}
+
 </style>
 <style>/* تعديل 41 */
 .pn:has(.qx){background:#0a0d0f}.qx .qbox{background:#0f1417;border:1px solid #1d272b}.qx .qa,.qx .qcm span,.qx .qkp span,.qx .qg{background:#11181b;border:1px solid #1d272b}.qx .qa.on{border-color:var(--p);background:#0f2a2d}.qx .qcm span.on{background:var(--p);border-color:var(--p);color:#04181a}
@@ -923,7 +937,27 @@ function more(){const s=V.sub;
    return `<div class="seg apt" style="margin-bottom:8px">${[['','🛒 بيع'],['inv','📦 المخزون'],['l','🕘 آخر العمليات'],['r','📊 التقارير']].map(q=>`<b class="${(V.ap||'')==q[0]?'on':''}" onclick="V.ap='${q[0]}';render()">${q[1]}</b>`).join('')}</div>${!V.ap?apPg():V.ap=='inv'?invPg():V.ap=='r'?TL+accSalesRep(sl):`<div>${sl.slice(0,30).map(row).join('')||'<div class=empty>لا توجد عمليات</div>'}</div><small>آخر 30 عملية — الباقي في السجل</small>`}`}
  if(s=='val'){const w=S.acc.filter(a=>a.ty=='wallet'||a.ty=='insta');
   return `<div class=seg><b onclick="V.sub='';render()">← رجوع</b></div><p style="color:var(--mu);font-size:13px">الدايرة بتبيّن الأيام المتبقية من 3 شهور (90 يوم) — بتتحول من الأخضر للأحمر كل ما الصلاحية تقرب تخلص. تقدر توقف أو تفعّل التتبع لكل حساب. التنبيه بيظهر قبل الانتهاء بـ 5 أيام.</p>`+w.map(a=>{const d=left(a),off=!!a.nv,pc=off?0:Math.min(100,Math.max(0,Math.round((90-d)/90*100))),col=off?'#ffffff1f':valCol(pc);return `<div class="card vl" style="${!off&&d<0?'border:1.5px dashed #d93a3a':''}"><div class=vring style="background:conic-gradient(${col} ${off?0:Math.max(6,100-pc)}%,#ffffff1f 0)"><span><b style="color:${off?'var(--mu)':col}">${off?'—':(d<0?'!':d)}</b><small>${off?'متوقف':'يوم'}</small></span></div><div class=mid><b>${ico(a)} ${a.name}</b><small>${a.no||''} • آخر مكالمة ${a.call||'—'}</small><small style="color:${off?'var(--mu)':col}">${off?'الصلاحية غير مفعّلة':(d<0?'انتهت منذ '+(-d)+' يوم':'باقي '+d+' يوم من 90')}</small></div><div class=vbt><button class=btn style="margin:0;padding:8px 10px;${off?'opacity:.4':''}" ${off?'disabled':''} onclick="askPin(()=>callDone(${a.id}))">📞 سجلت مكالمة</button><button class="btn g" style="margin:0;padding:8px 10px" onclick="askPin(()=>valTgl(${a.id}))">${off?'▶️ تفعيل 3 شهور':'⏸️ إيقاف'}</button></div></div>`}).join('')||'<div class=empty>لا توجد محافظ</div>'}
- return `<div class=menu onclick="go('pr')">📈 الأرباح</div><div class=menu onclick="cTgl()">🧮 الآلة الحاسبة</div><div class=menu onclick="settings()">⚙️ الإعدادات (العمولة والدفع والرقم السري)</div><div class=menu onclick="V.sub='acc';V.ap='';render()">🎧 الاكسسوار (مبيعات فقط)</div><div class=menu onclick="V.sub='short';render()">📝 نواقص الاكسسوار${(S.short||[]).filter(x=>!x.done).length?' ('+(S.short||[]).filter(x=>!x.done).length+')':''}</div><div class=menu onclick="V.sub='val';render()">📞 صلاحية الخط</div><div class=menu onclick="buyUI()">🛒 مشتريات المحل (بضاعة — تُخصم من رأس المال)</div><div class=menu onclick="capUI()">🏦 إدخال / إخراج نقدية للدرج (رأس مال، تسويات المحل)</div><div class=menu onclick="secUI()">🧩 تخصيص الأقسام (الاسم والأيقونة)</div><div class=menu onclick="cloudUI()"><span id=cld>${gIc()}</span> المزامنة (جوجل درايف — نسخ احتياطي ومزامنة)</div><div class=menu onclick="trPage()">🗑️ سلة المحذوفات${(S.trash||[]).length?' ('+S.trash.length+')':''}</div><div class=menu onclick="askPin(()=>exp())">💾 نسخة احتياطية (تنزيل ملف)</div><div class=menu onclick="askPin(()=>$('fi').click())">♻️ استعادة نسخة</div><div class=menu style="color:var(--rd)" onclick="askPin(()=>{if(confirm('مسح كل البيانات نهائيًا؟')){localStorage.removeItem('db1');location.reload()}})">🗑️ مسح كل البيانات</div>`}
+ const sn=(S.short||[]).filter(x=>!x.done).length,tn=(S.trash||[]).length,
+ mr=(ic,bg,t,sub,fn,bd,col)=>`<div class=mgr onclick="${fn}"><div class=mgic style="background:${bg}">${ic}</div><div class=mgtx><b ${col?`style="color:${col}"`:''}>${t}</b>${sub?`<small>${sub}</small>`:''}</div>${bd?`<span class=mgbd>${bd}</span>`:''}<span class=mgch>‹</span></div>`,
+ grp=(t,rows)=>`<div class=mgh>${t}</div><div class=mgc>${rows}</div>`;
+ return grp('العمل والمحل',
+  mr('📈','rgba(76,212,138,.16)','الأرباح','تتبع الأرباح اليومية والكلية',"go('pr')")+
+  mr('🎧','rgba(92,141,246,.16)','الاكسسوار','مبيعات ومخزون الاكسسوار',"V.sub='acc';V.ap='';render()")+
+  mr('📝','rgba(240,147,107,.16)','نواقص الاكسسوار','المنتجات المطلوب توفيرها',"V.sub='short';render()",sn||0)+
+  mr('📞','rgba(240,196,77,.16)','صلاحية الخط','متابعة صلاحية خطوط المحافظ',"V.sub='val';render()")+
+  mr('🛒','rgba(139,124,246,.16)','مشتريات المحل','بضاعة تُخصم من رأس المال',"buyUI()")+
+  mr('🏦','rgba(43,181,189,.16)','إدخال / إخراج نقدية للدرج','رأس مال وتسويات المحل',"capUI()")
+ )+grp('الإعدادات والتخصيص',
+  mr('⚙️','rgba(122,141,150,.18)','الإعدادات','العمولة والدفع والرقم السري',"settings()")+
+  mr('🧩','rgba(176,124,246,.16)','تخصيص الأقسام','الاسم والأيقونة والأزرار',"secUI()")+
+  mr('🧮','rgba(232,160,77,.16)','الآلة الحاسبة','حاسبة سريعة للمبالغ',"cTgl()")
+ )+grp('البيانات والأمان',
+  mr(`<span id=cld>${gIc()}</span>`,'rgba(77,166,255,.16)','المزامنة','جوجل درايف — نسخ احتياطي ومزامنة',"cloudUI()")+
+  mr('🗑️','rgba(232,115,115,.16)','سلة المحذوفات','استرجاع العمليات المحذوفة',"trPage()",tn||0)+
+  mr('💾','rgba(76,212,138,.16)','نسخة احتياطية','تنزيل ملف JSON على جهازك',"askPin(()=>exp())")+
+  mr('♻️','rgba(43,181,189,.16)','استعادة نسخة','استيراد من ملف نسخة احتياطية',"askPin(()=>$('fi').click())")+
+  mr('🗑️','rgba(255,107,107,.16)','مسح كل البيانات','حذف جميع البيانات نهائيًا',"askPin(()=>{if(confirm('مسح كل البيانات نهائيًا؟')){localStorage.removeItem('db1');location.reload()}})",0,'var(--rd)')
+ )}
 function go(k){if(k=='pr'&&V.tab!='pr')return askPin(()=>{V.tab='pr';V.sub='';render();scrollTo(0,0)});V.tab=k;V.sub='';if(k=='acc')V.at='';render();scrollTo(0,0)}
 function render(){applyTy();msAuto();recalc();expAuto();save();const t=V.tab;const body0=t=='home'?home():t=='acc'?accs():t=='log'?logPg():t=='pr'?prof_():t=='rep'?reports():t=='exp'?expPg():t=='buy'?buyPg():t=='att'?attPg():more();const body=body0;
  const N=NVK;
