@@ -387,9 +387,10 @@ table.sdt{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
 .sdhero b{display:block;font-size:17px;font-weight:800;direction:ltr;margin-top:2px;color:var(--tx)}.sdhero b.up{color:#4cd48a}.sdhero b.dn{color:#ff6b6b}
 </style>
 <style>
-.qfb.lg .q1l,.qfb.lg .q1l .q1e{font-size:calc(22px*var(--k))!important;font-weight:900!important;color:#fff!important;font-style:normal!important;line-height:1.25!important}
-.qfb.lg .q1l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;width:100%}
-.qfb.lg .q1l .q1e{margin-left:4px}
+.qfb b,.qfb .qfn,.qfb small,.qmt small,.qmt b{display:block;width:100%;white-space:nowrap;overflow:hidden;text-overflow:clip!important}
+.qfb.lg .q1l{font-size:calc(22px*var(--k))!important;font-weight:900!important;color:#fff!important;font-style:normal!important;line-height:1.25!important;white-space:nowrap;overflow:hidden;text-overflow:clip!important;display:block;width:100%}
+.qfb.lg .q1l .q1e{font-size:1em!important;font-weight:900!important;color:#fff!important;font-style:normal!important;line-height:inherit!important;margin-left:4px}
+.qfb.lg .q1l .si img{width:1.1em!important;height:1.1em!important}
 .qx .qa{font-size:20px!important;font-weight:900!important}
 .qx .qam{font-size:calc(54px*var(--qs-amt,1))!important;font-weight:900!important}
 </style>
@@ -486,7 +487,9 @@ function qFt(v,f,t,pf){const p=$('qft');if(!p||!f||!t)return;
  pt=!ok?'':pf>0?'ربحك +'+fmt(pf):pf<0?'خسارتك −'+fmt(-pf):'بدون ربح',ng=ok&&pf<0,
  nm=a=>a.ty=='drawer'?'الدرج':esc(a.name);
  p.innerHTML=`<div class=qfr>${box(f,1,v.a,r2(f.bal-v.a))}<i class=qfa>←</i>${box(t,0,v.b,r2(t.bal+v.b))}</div><div class=\"qpb ${ng?'neg':''}\">${pt||'اكتب المبلغ لعرض الربح'}</div><div class=qmt><div><small>خارج من ${nm(f)}</small><b dir=ltr style=\"color:#f08a8a\">${ok?'−'+fmt(v.a):'—'}</b></div><div><small>داخل ${t.ty=='drawer'?'للدرج':'إلى '+esc(t.name)}</small><b dir=ltr style=\"color:#6fd49a\">${ok?'+'+fmt(v.b):'—'}</b></div><div><small>${pf<0?'الخسارة':'الربح'}</small><b dir=ltr style=\"color:${ng?'#f08a8a':'#6fd49a'}\">${ok?(pf<0?'−':'+')+fmt(Math.abs(pf)):'—'}</b></div></div>`;
- const q3=$('qpf3');if(q3){q3.textContent=pt;q3.classList.toggle('neg',ng)}}
+ const q3=$('qpf3');if(q3){q3.textContent=pt;q3.classList.toggle('neg',ng)}qFitTxt();requestAnimationFrame(qFitTxt)}
+function qFitTxt(){const p=$('qft');if(!p)return;const rng=document.createRange();p.querySelectorAll('.qfb b,.qfb .qfn,.qfb small,.qmt small,.qmt b').forEach(el=>{el.style.removeProperty('font-size');el.style.removeProperty('line-height');const cw=el.clientWidth;if(cw<=0)return;const h0=el.offsetHeight,avail=Math.max(10,cw-2);let fs=parseFloat(getComputedStyle(el).fontSize);const fs0=fs;rng.selectNodeContents(el);while((el.scrollWidth>cw||rng.getBoundingClientRect().width>avail)&&fs>8){fs-=0.5;el.style.setProperty('font-size',fs+'px','important');rng.selectNodeContents(el)}if(fs<fs0&&h0>0)el.style.setProperty('line-height',h0+'px','important')});const am=$('am');if(am&&am.classList.contains('qam')){am.style.removeProperty('font-size');const cw=am.clientWidth;if(cw>0){let fs=parseFloat(getComputedStyle(am).fontSize);while(am.scrollWidth>cw&&fs>22){fs-=1;am.style.setProperty('font-size',fs+'px','important')}}}}
+window.addEventListener('resize',()=>requestAnimationFrame(qFitTxt));window.addEventListener('orientationchange',()=>setTimeout(qFitTxt,180));if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>requestAnimationFrame(qFitTxt));
 /* تعديل: فاصلة الآلاف أثناء كتابة المبلغ — القيمة الحقيقية (value) بتفضل أرقام صافية والمعروض بس هو المنسّق */
 const fmtTyp=r=>{r=String(r||'');const i=r.indexOf('.'),ip=i<0?r:r.slice(0,i);return ip.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(i<0?'':r.slice(i))};
 function qdAmt(){const am=$('am');if(!am||am._fm)return;try{const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');let raw=String(am.value||'');const show=()=>d.set.call(am,fmtTyp(raw));Object.defineProperty(am,'value',{get(){return raw},set(v){raw=String(v==null?'':v);show()},configurable:true});am._fm=1;show()}catch(e){}}
