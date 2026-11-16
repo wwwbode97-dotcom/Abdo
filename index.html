@@ -1181,7 +1181,7 @@ function trEmpty(){if(!confirm('إفراغ السلة بالكامل؟ مش هي
 /* ===== تعديل 64: إجمالي بالعمولة + فترات التقارير + تسوية الموردين التلقائي عند الصفر ===== */
 function wcom(R){return r2((R.M||0)+(R.pr||0))}
 function autoSet(a){S.sett=S.sett||[];addTx({k:'set',sid:a.id,n:'مطابق ✓ — الرصيد 0 (تسوية تلقائي للمورد)'});const T=Date.now()+2;S.sett.unshift({id:S.seq++,d:ymd(),ts:T,acc:a.id,exp:0,act:0,diff:0,dest:'',note:'تسوية تلقائي — الرصيد وصل صفر',ty:'o',auto:1});a.ls=a.ls||{};a.ls.day=ymd();a.sv={d:ymd(),ts:T};if(V.dp)delete V.dp[a.id];try{toast('✓ '+a.name+' وصل صفر — اتسوّى تلقائي')}catch(e){}}
-function atmTop(w){const ok=a=>isVis(a)&&(w=='f'?(a.ty=='wallet'||a.ty=='insta'):a.ty=='drawer';return S.acc.filter(ok).sort((x,y)=>useToday(y.id)-useToday(x.id)).slice(0,6).map(a=>a.id)}
+function atmTop(w){const ok=a=>isVis(a)&&(w=='f'?(a.ty=='wallet'||a.ty=='insta'):a.ty=='drawer');return S.acc.filter(ok).sort((x,y)=>useToday(y.id)-useToday(x.id)).slice(0,6).map(a=>a.id)}
 function swp(){if(XK=='a')return;const a=$('f').value,b=$('t').value;$('f').innerHTML=opts(b);$('t').innerHTML=opts(a);chg()}
 function pvIn(){CE=1;QP=null;if(!PS)pt(1,1);else showSum()}
 function calc(){if(AX)aFee();const r=rate_(),M=+$('am').value||0,l=$('pl0');if(l)l.textContent=XK=='a'?'خسارة السحب':r>0?`الربح (${r}% — تقدر تغيّره)`:'ربح / خسارة إضافي';
