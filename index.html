@@ -214,6 +214,32 @@ nav img,.nvp img{width:26px;height:26px;border-radius:7px;object-fit:cover}
 .mgbd{background:var(--cd2);color:var(--p);border:1px solid var(--ln);border-radius:10px;padding:2px 8px;font-size:12px;font-weight:700}
 .mgch{color:var(--mu);font-size:18px;font-weight:700}
 
+
+/* تعديل: تكبير وتضخيم الخطوط داخل المربعات في كل الصفحات بدون تغيير حجم أو مكان أي مربع */
+.qfb em{text-align:right;font-size:calc(12px*var(--k))!important;font-weight:800;line-height:1.1}
+.qfb b{font-size:calc(20px*var(--k))!important;font-weight:900!important;line-height:1.2}
+.qfb .si img{width:calc(24px*var(--k))!important;height:calc(24px*var(--k))!important}
+.qmt small{font-size:calc(13px*var(--qs-pf,1))!important;font-weight:800!important;color:#c8d6d5!important}
+.qmt b{font-size:calc(19px*var(--qs-pf,1))!important;font-weight:900!important}
+.qx .qam{font-size:calc(54px*var(--qs-amt,1))!important;font-weight:900!important}
+.qx .qa{font-size:17px!important;font-weight:800!important}
+.qx .qcm span,.qx .qpvx{font-size:17px!important;font-weight:900!important}
+.qx .qb .btn{font-size:21px!important;font-weight:900!important}
+.d3l{font-size:14px!important;font-weight:800!important}
+.d3n{font-size:18px!important;font-weight:900!important}
+.d3a .big{font-size:56px!important;font-weight:900!important}
+.exr small{font-size:14px!important;font-weight:800!important}
+.exr input,.exc span,.exs span{font-size:16.5px!important;font-weight:800!important}
+.exa input{font-size:54px!important;font-weight:900!important}
+.ex .btn{font-size:20px!important;font-weight:900!important}
+.card .mid b,.gc b,.tl b,.tl small,.mgr .mgtx b{font-weight:800!important}
+.gc b{font-size:17px!important}
+.card .mid b{font-size:18px!important}
+.tl .tv{font-size:23px!important;font-weight:900!important}
+.tot h1{font-weight:900!important}
+.op .opn{font-size:16px!important;font-weight:900!important}
+.op .opa{font-size:22px!important;font-weight:900!important}
+
 </style>
 <style>/* تعديل 41 */
 .pn:has(.qx){background:#0a0d0f}.qx .qbox{background:#0f1417;border:1px solid #1d272b}.qx .qa,.qx .qcm span,.qx .qkp span,.qx .qg{background:#11181b;border:1px solid #1d272b}.qx .qa.on{border-color:var(--p);background:#0f2a2d}.qx .qcm span.on{background:var(--p);border-color:var(--p);color:#04181a}
@@ -360,6 +386,13 @@ table.sdt{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
 .sdhero div{background:var(--cd2);border:1px solid var(--ln);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;color:var(--mu)}
 .sdhero b{display:block;font-size:17px;font-weight:800;direction:ltr;margin-top:2px;color:var(--tx)}.sdhero b.up{color:#4cd48a}.sdhero b.dn{color:#ff6b6b}
 </style>
+<style>
+.qfb.lg .q1l,.qfb.lg .q1l .q1e{font-size:calc(22px*var(--k))!important;font-weight:900!important;color:#fff!important;font-style:normal!important;line-height:1.25!important}
+.qfb.lg .q1l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;width:100%}
+.qfb.lg .q1l .q1e{margin-left:4px}
+.qx .qa{font-size:20px!important;font-weight:900!important}
+.qx .qam{font-size:calc(54px*var(--qs-amt,1))!important;font-weight:900!important}
+</style>
 </head>
 <body>
 <div id="gate"><div class="gl">📒</div><h1>دفتر الحسابات</h1><p>سجّل الدخول بحساب جوجل. بياناتك بتتحفظ على موبايلك وعلى جوجل درايف بتاعك فقط.</p>
@@ -449,7 +482,7 @@ const qdCur=()=>QDL.includes(S.qd)?S.qd:1;
 function qdApply(x){const q=Object.assign({amt:100,dr:100,wl:100,pf:100,kp:100},S.qs||{});Object.keys(q).forEach(k=>x.style.setProperty('--qs-'+k,String(Math.min(150,Math.max(60,+q[k]||100))/100)))}
 function qFt(v,f,t,pf){const p=$('qft');if(!p||!f||!t)return;
  const ok=v.M>0,ed=!!EID,nb=x=>`<bdi>${fmt(x)}</bdi>`,
- box=(a,fr,amt,aft)=>{const sm=a.ty=='drawer';return `<div class=\"qfb ${fr?'r':'g'} ${sm?'sm':'lg'}\"><em>${fr?'من':'إلى'}</em><b>${sm?'':ico(a,1)+' '}${esc(a.name)}</b><span class=qfn dir=ltr>${ok?(fr?'−':'+')+fmt(amt):'—'}</span>${ed?'':`<small class=qfs>${sm?'رصيد '+nb(aft):nb(a.bal)+' ← '+nb(aft)}</small>`}</div>`},
+ box=(a,fr,amt,aft)=>{const sm=a.ty=='drawer';return `<div class=\"qfb ${fr?'r':'g'} ${sm?'sm':'lg'}\">${sm?`<em>${fr?'من':'إلى'}</em><b>${esc(a.name)}</b>`:`<b class=q1l><em class=q1e>${fr?'من':'إلى'}</em> ${ico(a,1)} ${esc(a.name)}</b>`}<span class=qfn dir=ltr>${ok?(fr?'−':'+')+fmt(amt):'—'}</span>${ed?'':`<small class=qfs>${sm?'رصيد '+nb(aft):nb(a.bal)+' ← '+nb(aft)}</small>`}</div>`},
  pt=!ok?'':pf>0?'ربحك +'+fmt(pf):pf<0?'خسارتك −'+fmt(-pf):'بدون ربح',ng=ok&&pf<0,
  nm=a=>a.ty=='drawer'?'الدرج':esc(a.name);
  p.innerHTML=`<div class=qfr>${box(f,1,v.a,r2(f.bal-v.a))}<i class=qfa>←</i>${box(t,0,v.b,r2(t.bal+v.b))}</div><div class=\"qpb ${ng?'neg':''}\">${pt||'اكتب المبلغ لعرض الربح'}</div><div class=qmt><div><small>خارج من ${nm(f)}</small><b dir=ltr style=\"color:#f08a8a\">${ok?'−'+fmt(v.a):'—'}</b></div><div><small>داخل ${t.ty=='drawer'?'للدرج':'إلى '+esc(t.name)}</small><b dir=ltr style=\"color:#6fd49a\">${ok?'+'+fmt(v.b):'—'}</b></div><div><small>${pf<0?'الخسارة':'الربح'}</small><b dir=ltr style=\"color:${ng?'#f08a8a':'#6fd49a'}\">${ok?(pf<0?'−':'+')+fmt(Math.abs(pf)):'—'}</b></div></div>`;
@@ -961,7 +994,8 @@ function more(){const s=V.sub;
 function go(k){if(k=='pr'&&V.tab!='pr')return askPin(()=>{V.tab='pr';V.sub='';render();scrollTo(0,0)});V.tab=k;V.sub='';if(k=='acc')V.at='';render();scrollTo(0,0)}
 function render(){applyTy();msAuto();recalc();expAuto();save();const t=V.tab;const body0=t=='home'?home():t=='acc'?accs():t=='log'?logPg():t=='pr'?prof_():t=='rep'?reports():t=='exp'?expPg():t=='buy'?buyPg():t=='att'?attPg():more();const body=body0;
  const N=NVK;
- $('app').innerHTML=`<header><span>📒 دفتر الحسابات</span><div><span class=hb onclick="gSrch()">🔍</span><span class=hb onclick="showNotes()">🔔<i class=bd id=hbn style="display:none"></i></span></div></header><main>${body}</main><nav>${N.map(n=>`<div class="${t==n[0]||(n[0]=='home'&&t=='att')||(n[0]=='more'&&['pr','rep','exp','buy'].includes(t))?'on':''}" onclick="go('${n[0]}')"><span>${nvIc(n[0])}</span>${n[1]}</div>`).join('')}</nav>`}
+ const _ao=attOpen(),_ap=`<button onclick="attTog()" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid ${_ao?'rgba(76,212,138,.55)':'rgba(255,107,107,.45)'};background:${_ao?'rgba(76,212,138,.15)':'rgba(255,107,107,.12)'};color:${_ao?'var(--gr)':'var(--rd)'}"><i style="width:8px;height:8px;border-radius:50%;background:${_ao?'var(--gr)':'var(--rd)'};display:inline-block"></i>${_ao?'مفتوح':'مقفول'}</button>`;
+ $('app').innerHTML=`<header><div style="display:flex;align-items:center;gap:8px"><span>📒 دفتر الحسابات</span>${_ap}</div><div><span class=hb onclick="gSrch()">🔍</span><span class=hb onclick="showNotes()">🔔<i class=bd id=hbn style="display:none"></i></span></div></header><main>${body}</main><nav>${N.map(n=>`<div class="${t==n[0]||(n[0]=='home'&&t=='att')||(n[0]=='more'&&['pr','rep','exp','buy'].includes(t))?'on':''}" onclick="go('${n[0]}')"><span>${nvIc(n[0])}</span>${n[1]}</div>`).join('')}</nav>`}
 const useToday=i=>S.tx.filter(x=>x.d==ymd()&&x.k!='adj'&&(x.f==i||x.t==i)).length;
 function opts(sel,q,side){const sd=side||(()=>{const a=A(sel);return a?(a.ty=='drawer'?'t':(a.ty=='wallet'||a.ty=='insta')?'f':''):''})(),ok=a=>isVis(a)&&!(XON&&(XK=='r'||XK=='s')&&a.ty=='client')&&(!(XON&&XK=='a')||(sd=='f'?(a.ty=='wallet'||a.ty=='insta'):sd=='t'?a.ty=='drawer':(a.ty=='wallet'||a.ty=='insta'||a.ty=='drawer')))&&nameMatch(a,q),op=a=>`<option value=${a.id} ${a.id==sel?'selected':''}>${a.grp?a.grp+' - ':''}${a.name}</option>`,
  all=srtAcc(S.acc.filter(ok)),uc={};all.forEach(a=>uc[a.id]=useToday(a.id));const fv=(XON&&(XK=='r'||XK=='s'||XK=='t'))?favGet(XK):[],tp=all.filter(a=>fv.includes(a.id)||uc[a.id]>0).sort((x,y)=>{const fx=fv.indexOf(x.id),fy=fv.indexOf(y.id);if(fx>=0||fy>=0)return(fx<0?999:fx)-(fy<0?999:fy);return uc[y.id]-uc[x.id]});
@@ -1354,12 +1388,15 @@ function notes0(){const L=[];S.acc.forEach(a=>{if(a.ty=='wallet'||a.ty=='insta')
  [['dl','اليومي',ymd()],['ml','الشهري',ymd().slice(0,7)]].forEach(([k,l,p])=>{if(a[k]){const pc=used(a,p)/a[k];if(pc>=.8)L.push({k:'lim:'+a.id+':'+k+':'+(pc>=1?2:1),i:'🔴',t:`${a.name}: وصل ${Math.round(pc*100)}% من الليمت ${l}`})}})}
  rmNote(a,L);if((a.pend||[]).length){const t=a.pend.reduce((s,p)=>s+p.amt,0);L.push({k:'pend:'+a.id+':'+a.pend.length+':'+t,i:'⏳',t:`${a.name}: ${a.pend.length} عملية معلقة بمبلغ ${fmt(t)}`})}
  if((a.ty=='drawer'||a.ty=='machine')&&(a.ls||{}).day!=ymd()&&nowHM()>=((S.set||{}).sa||'23:30'))L.push({k:'set:'+a.id+':'+ymd(),i:'⚖️',t:`${a.name}: لم تتم التسوية اليوم`})});
+ const _ao=attOpen();
+ if(_ao&&(nowHM()>='23:30'||ymd(new Date(_ao.s))<ymd()))L.push({k:'att_c:'+ymd(),i:'🔴',t:'نسيت تقفل المحل! مفتوح منذ '+hmS(_ao.s)+' — اضغط للقفل',att:1});
+ if(!_ao&&nowHM()>='10:00'&&S.tx.some(x=>x.d==ymd()&&x.k!='adj'&&x.k!='set'))L.push({k:'att_o:'+ymd(),i:'🟢',t:'بدأت معاملات النهاردة ولسه ما فتحتش المحل — اضغط للفتح',att:1});
  if(S.lastBk&&(Date.now()-new Date(S.lastBk+'T12:00').getTime())/864e5>=7)L.push({k:'bk:'+S.lastBk,i:'💾',t:'مر أسبوع أو أكثر على آخر نسخة احتياطية — نزّل نسخة من المزيد',go:'x'});return L}
 function notes(){const L=notes0();S.dis=S.dis||{};Object.keys(S.dis).forEach(k=>{if(!L.some(n=>n.k==k))delete S.dis[k]});return L.filter(n=>!S.dis[n.k])}
 function dn(k){S.dis=S.dis||{};S.dis[k]=1;render();showNotes()}
 function dnAll(){S.dis=S.dis||{};notes0().forEach(n=>S.dis[n.k]=1);render();showNotes()}
 function clrLog(){S.log=[];save();showNotes()}
-function showNotes(){const L=notes(),g=S.log||[];sheet('🔔 الإشعارات',(L.map(n=>`<div class=alert style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="flex:1" ${n.go?`onclick="closeSh();V.tab='more';V.sub='${n.go}';render()"`:n.rm?`onclick="closeSh();detail(${n.rm})"`:''}>${n.i} ${n.t}</span><b onclick="dn('${n.k}')" style="padding:4px 8px">✕</b></div>`).join('')||'<div class=empty>لا توجد تنبيهات حاليًا 👌</div>')+(L.length?'<button class="btn g" onclick="dnAll()">🧹 مسح كل الإشعارات</button>':'')+(g.length?'<b>آخر النشاط</b>'+g.slice(0,15).map(l=>`<div class=tx><small>${l.d}</small><div>${l.t}</div></div>`).join('')+'<button class="btn g" onclick="clrLog()">🧹 مسح سجل النشاط</button>':''))}
+function showNotes(){const L=notes(),g=S.log||[];sheet('🔔 الإشعارات',(L.map(n=>`<div class=alert style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="flex:1" ${n.go?`onclick="closeSh();V.tab='more';V.sub='${n.go}';render()"`:n.att?`onclick="closeSh();attUI()"`:n.rm?`onclick="closeSh();detail(${n.rm})"`:''}>${n.i} ${n.t}</span><b onclick="dn('${n.k}')" style="padding:4px 8px">✕</b></div>`).join('')||'<div class=empty>لا توجد تنبيهات حاليًا 👌</div>')+(L.length?'<button class="btn g" onclick="dnAll()">🧹 مسح كل الإشعارات</button>':'')+(g.length?'<b>آخر النشاط</b>'+g.slice(0,15).map(l=>`<div class=tx><small>${l.d}</small><div>${l.t}</div></div>`).join('')+'<button class="btn g" onclick="clrLog()">🧹 مسح سجل النشاط</button>':''))}
 
 const BR=[['👛','#7b4bd6','محفظة'],['V','#e60000','فودافون'],['O','#ff7900','أورنج'],['AP','#0a8f8f','اكسس باي'],['📟','#455a64','POS'],['F','#f2a900','فوري'],['🚚','#6a2c91','سوبي باي']];
 function pickB(i){const b=BR[i];ICN.ic=b[0];ICN.col=b[1];ICN.img='';updI()}
