@@ -1028,8 +1028,8 @@ function flt(w,q){const s=$(w);s.innerHTML=opts(s.value,q.trim(),w);const box=s.
 function pick(w,i){$(w).innerHTML=opts(i,'',w);chg()}
 let EID=0,XON=false;
 const up5=x=>x>0?Math.ceil(x/5-1e-9)*5:0;
-function rate_(){const f=A($('f').value),t=A($('t').value),ins=(f&&f.ty=='insta')||(t&&t.ty=='insta');return XK=='r'?(ins?S.set.ci:S.set.cr):XK=='s'?(ins?S.set.ci:S.set.cs):0}
-function xferOld(k,f,t,pre){AX=null;FE_MAN=0;if(k=='a')return xferA(k,f,t,pre);if(k=='t')return xferD3(k,f,t,pre);pre=pre||{};XK=k;XON=true;EID=pre.eid||0;PS=k=='a'?0:pre.pr?(pre.pr>0?1:-1):((k=='r'||k=='s')?1:0);CE=(pre.man&&k!='a')?1:0;XD=k=='a'?'out':(pre.dr||(k=='r'?'in':'out'));
+function rate_(){const f=A($('f').value),t=A($('t').value),ins=(f&&f.ty=='insta')||(t&&t.ty=='insta');return XK=='r'?(ins?S.set.ci:S.set.cr):XK=='s'?(ins?S.set.ci:S.set.cs):(XK=='t'&&f&&f.ty=='client'&&t&&t.ty=='wallet')?1.5:0}
+function xferOld(k,f,t,pre){AX=null;FE_MAN=0;if(k=='a')return xferA(k,f,t,pre);if(k=='t')return xferD3(k,f,t,pre);pre=pre||{};XK=k;XON=true;EID=pre.eid||0;PS=k=='a'?0:pre.pr?(pre.pr>0?1:-1):((k=='r'||k=='s')?1:0);CE=(k!='a'&&(pre.man||(pre.pr!=null&&!pre.pr)))?1:0;XD=k=='a'?'out':(pre.dr||(k=='r'?'in':'out'));
  const fv=favGet(k),F=f||(k=='r'?first('drawer'):(k=='t'&&fv[0])||(k=='s'&&mostUsedToday('s'))||(k=='t'&&mostUsedToday('t'))||first('wallet')||first('drawer')),T=t||(k=='a'?first('drawer'):k=='r'?mostTo(first('drawer'),'r'):(k=='t'&&fv[1]&&fv[1]!=F)?fv[1]:first('drawer'));
  const KN=[['t','🔁 تحويل'],['r','📥 استلام'],['s','📤 لعميل'],['a','🏧 ATM']];
  sheet((EID?'✏️ تعديل العملية':'🔁 تحويل')+` <i onclick="pgTxRep('${k}')" style="font-style:normal;cursor:pointer;margin-right:8px;font-size:19px" title="تقرير الصفحة">📊</i>`,
@@ -1045,7 +1045,7 @@ function xferOld(k,f,t,pre){AX=null;FE_MAN=0;if(k=='a')return xferA(k,f,t,pre);i
  setTimeout(xTop,60);if(pre.dts){$('dt').value=pre.dts;DTM.dt=pre.dt0}if(pre.M!=null&&pre.M!=='')$('am').value=pre.M;if(pre.nt)$('nt').value=pre.nt;
  pt(PS,1);chg();setDr(XD);if(pre.fe!=null&&$('fe'))$('fe').value=pre.fe;if(pre.ps)$('ps').value=pre.ps;if(pre.pr!=null&&CE)$('pv').value=Math.abs(pre.pr);showSum();calcSync()}
 
-function xferD3(k,f,t,pre){pre=pre||{};FE_MAN=0;XK=k;XON=true;EID=pre.eid||0;PS=k=='a'?0:pre.pr?(pre.pr>0?1:-1):((k=='r'||k=='s')?1:0);CE=(pre.man&&k!='a')?1:0;XD=k=='a'?'out':(pre.dr||(k=='r'?'in':'out'));
+function xferD3(k,f,t,pre){pre=pre||{};FE_MAN=0;XK=k;XON=true;EID=pre.eid||0;PS=k=='a'?0:pre.pr?(pre.pr>0?1:-1):((k=='r'||k=='s')?1:0);CE=(k!='a'&&(pre.man||(pre.pr!=null&&!pre.pr)))?1:0;XD=k=='a'?'out':(pre.dr||(k=='r'?'in':'out'));
  const fv=favGet(k),F=f||(k=='r'?first('drawer'):(k=='t'&&fv[0])||(k=='s'&&mostUsedToday('s'))||(k=='t'&&mostUsedToday('t'))||first('wallet')||first('drawer')),T=t||(k=='a'?first('drawer'):k=='r'?mostTo(first('drawer'),'r'):(k=='t'&&fv[1]&&fv[1]!=F)?fv[1]:first('drawer'));
  const KN=[['t','🔁 تحويل'],['r','📥 استلام'],['s','📤 لعميل'],['a','🏧 ATM']];
  sheet((EID?'✏️ تعديل العملية':'🔁 تحويل')+` <i onclick="pgTxRep('${k}')" style="font-style:normal;cursor:pointer;margin-right:8px;font-size:19px" title="تقرير الصفحة">📊</i>`,
@@ -1301,10 +1301,10 @@ function trEmpty(){if(!confirm('إفراغ السلة بالكامل؟ مش هي
 function wcom(R){return r2((R.M||0)+(R.pr||0))}
 function autoSet(a){S.sett=S.sett||[];addTx({k:'set',sid:a.id,n:'مطابق ✓ — الرصيد 0 (تسوية تلقائي للمورد)'});const T=Date.now()+2;S.sett.unshift({id:S.seq++,d:ymd(),ts:T,acc:a.id,exp:0,act:0,diff:0,dest:'',note:'تسوية تلقائي — الرصيد وصل صفر',ty:'o',auto:1});a.ls=a.ls||{};a.ls.day=ymd();a.sv={d:ymd(),ts:T};if(V.dp)delete V.dp[a.id];try{toast('✓ '+a.name+' وصل صفر — اتسوّى تلقائي')}catch(e){}}
 function atmTop(w){const ok=a=>isVis(a)&&(w=='f'?(a.ty=='wallet'||a.ty=='insta'):a.ty=='drawer');return S.acc.filter(ok).sort((x,y)=>useToday(y.id)-useToday(x.id)).slice(0,6).map(a=>a.id)}
-function swp(){if(XK=='a')return;const a=$('f').value,b=$('t').value;$('f').innerHTML=opts(b);$('t').innerHTML=opts(a);chg()}
+function swp(){if(XK=='a')return;const a=$('f').value,b=$('t').value;if(XK=='t'){CE=0;if($('pv'))$('pv').value='';pt(0,1)}$('f').innerHTML=opts(b);$('t').innerHTML=opts(a);chg()}
 function pvIn(){CE=1;QP=null;if(!PS)pt(1,1);else showSum()}
 function calc(){if(AX)aFee();const r=rate_(),M=+$('am').value||0,l=$('pl0'),f0=$('f')&&A($('f').value);if($('fe')&&!FE_MAN&&f0&&f0.ty=='insta'&&(XK=='s'||XK=='t'))$('fe').value=instaFee(M);if(l)l.textContent=XK=='a'?'خسارة السحب':r>0?`الربح (${r}% — تقدر تغيّره)`:'ربح / خسارة إضافي';
- if(XK=='a'){$('pv').value='';PS=0}else if(QX&&QP!=null){$('pv').value=M>0?up5((M>=1000?Math.floor(M/100)*100:M)*QP/100):'';if(!PS)pt(1,1)}else if(r>0&&!CE){$('pv').value=M>0?up5((M>=1000?Math.floor(M/100)*100:M)*r/100):'';if(!PS)pt(1,1)}showSum()}
+ if(XK=='a'){$('pv').value='';PS=0}else if(QX&&QP!=null){$('pv').value=M>0?up5((M>=1000?Math.floor(M/100)*100:M)*QP/100):'';if(!PS)pt(1,1)}else if(r>0&&!CE){$('pv').value=M>0?up5((M>=1000?Math.floor(M/100)*100:M)*r/100):'';if(!PS)pt(1,1)}else if(!r&&!CE&&XK=='t'&&$('pv')){$('pv').value='';if(PS)pt(0,1)}showSum()}
 function pt(v,keep){PS=(PS==v&&!keep)?0:v;$('pu').className='';$('pl').className='';if(PS==1)$('pu').className='u';if(PS==-1)$('pl').className='l';if($('smr'))showSum()}
 function chg(){if(QX)qFix();if(!QX&&XK!='a'&&$('f')&&$('t')){const _f=A($('f').value),_t=A($('t').value),_c=q=>!!q&&q.ty=='client';if(_c(_f)&&!_c(_t))setDr('in');else if(_c(_t)&&!_c(_f))setDr('out')}const f=A($('f').value),t=A($('t').value);
  $('ps').value=!(f&&f.ty=='client')&&!(t&&t.ty=='client')&&((f&&f.ty=='machine')||(t&&t.ty=='machine'))?'machine':'cash';$('lh').innerHTML=t&&(t.ty=='wallet'||t.ty=='insta')?limBar(t):'';FE_MAN=0;if($('fe'))$('fe').value=(f&&f.ty=='insta'&&(XK=='s'||XK=='t'))?instaFee(+$('am').value||0):(XK=='s'?0:(f&&(f.ty=='wallet'||f.ty=='insta')?defFee(f):0));calc()}
