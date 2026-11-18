@@ -696,7 +696,8 @@ const H=v=>S.hide?'••••':fmt(v);function tglH(){S.hide=!S.hide;render()}
 const fmt=n=>(Math.round(n*100)/100).toLocaleString('en-US');
 const ymd=d=>{d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 let LASTJ='',GST='off';const gIc=()=>({off:'☁️',ok:'☁️✓',sync:'🔄',auth:'☁️⚠️',err:'☁️❌'})[GST]||'☁️';
-const save=()=>{try{const j=JSON.stringify(S,(k,v)=>(k=='upd'||k=='hide')?undefined:v);if(j!==LASTJ){const f=LASTJ==='';LASTJ=j;if(!f){S.upd=Date.now();if(window.cloudDirty)cloudDirty()}}localStorage.setItem('db1',JSON.stringify(S))}catch(e){}};
+const _sFilt=(k,v)=>(k=='upd'||k=='hide'||k=='dis'||k=='expM'||k=='lastBk')?undefined:v;
+const save=()=>{try{const j=JSON.stringify(S,_sFilt);if(j!==LASTJ){const f=LASTJ==='';LASTJ=j;if(!f){S.upd=Date.now();if(window.cloudDirty)cloudDirty()}}localStorage.setItem('db1',JSON.stringify(S))}catch(e){}};
 const sum=f=>S.acc.filter(f).reduce((s,a)=>s+a.bal,0);
 const prof=(sec,pre)=>S.tx.filter(x=>x.s==sec&&(!pre||x.d.startsWith(pre))).reduce((s,x)=>s+(x.p||0),0);
 const used=(w,pre)=>{let u=S.tx.filter(x=>x.t==w.id&&x.k!='adj'&&x.d.startsWith(pre)).reduce((s,x)=>s+x.b,0);
@@ -1909,21 +1910,69 @@ const gUpd=f=>+((f.appProperties||{}).upd||0);
 async function gVersions(api,files,body,upd){const vs=files.filter(f=>f.name.startsWith('v-')).sort((a,b)=>b.modifiedTime.localeCompare(a.modifiedTime));
  if(!vs[0]||Date.now()-new Date(vs[0].modifiedTime).getTime()>6*36e5){await api.put('v-'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'.json',body,upd,0)}
  for(const f of vs.slice(4))await api.del(f.id)}
-async function gPull(api,main){const d=JSON.parse(await api.get(main.id));if(!d.acc)throw new Error('ملف غير صالح');try{const cur=JSON.stringify(S),oldP=localStorage.getItem('db_prev');if(oldP){const dp=JSON.parse(oldP),dr=JSON.parse(localStorage.getItem('db_rescue')||'null');if(!dr||((dp.tx||[]).length>=(dr.tx||[]).length))localStorage.setItem('db_rescue',oldP)}const dr2=JSON.parse(localStorage.getItem('db_rescue')||'null');if(!dr2||((S.tx||[]).length>=(dr2.tx||[]).length))localStorage.setItem('db_rescue',cur);localStorage.setItem('db_prev',cur)}catch(e){}
+function locSavePrev(dObj){try{const cur=JSON.stringify(dObj),oldP=localStorage.getItem('db_prev');if(oldP){const dp=JSON.parse(oldP),dr=JSON.parse(localStorage.getItem('db_rescue')||'null');if(!dr||((dp.tx||[]).length>=(dr.tx||[]).length))localStorage.setItem('db_rescue',oldP)}const dr2=JSON.parse(localStorage.getItem('db_rescue')||'null');if(!dr2||((dObj.tx||[]).length>=(dr2.tx||[]).length))localStorage.setItem('db_rescue',cur);localStorage.setItem('db_prev',cur)}catch(e){}}
+async function gPull(api,main,preData){const d=preData||JSON.parse(await api.get(main.id));if(!d.acc)throw new Error('ملف غير صالح');locSavePrev(S);
  S=d;S.set=Object.assign({cr:1.5,cs:1,ci:1},S.set||{});LASTJ='';save();GD.cfg.synced=gUpd(main)||(+d.upd||0);GD.cfg.fid=main.id;gsave();render()}
-async function gPush(api,files,main){const body=JSON.stringify(S),upd=S.upd||Date.now();if(!S.upd)S.upd=upd;
+async function gPush(api,files,main,snapRemote){
+ if(snapRemote&&main){try{const rbTxt=typeof snapRemote=='string'?snapRemote:await api.get(main.id),rb=JSON.parse(rbTxt);if(rb&&rb.acc)await api.put('v-'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'-auto.json',rbTxt,gUpd(main)||rb.upd||Date.now(),0)}catch(e){}}
+ const body=JSON.stringify(S),upd=S.upd||Date.now();if(!S.upd)S.upd=upd;
  const id=await api.put('ledger.json',body,upd,main?main.id:0);GD.cfg.fid=id;GD.cfg.synced=upd;gsave();await gVersions(api,files,body,upd)}
-async function syncCore(api,ask){const files=await api.list(),main=files.find(f=>f.name=='ledger.json'),lu=S.upd||0,ls=GD.cfg.synced||0;
+function gIsSup(big,small){try{const bt=big.tx||[],st=small.tx||[];if(bt.length<=st.length)return false;if((big.acc||[]).length<(small.acc||[]).length||(big.trash||[]).length>(small.trash||[]).length)return false;const bm=new Map();bt.forEach(x=>bm.set(x.id+'|'+x.ts,x.a+'|'+x.b+'|'+(x.edts||0)));return st.every(x=>bm.get(x.id+'|'+x.ts)===(x.a+'|'+x.b+'|'+(x.edts||0)))}catch(e){return false}}
+function gConflictUI(rb,ru,lu){return new Promise(res=>{
+ const o0=$('gcfo');if(o0)o0.remove();
+ const rTx=(rb.tx||[]),lTx=(S.tx||[]),rn=rTx.length,ln=lTx.length,rLast=rTx[0],lLast=lTx[0];
+ const rBest=rn>ln||(rn==ln&&ru>=lu),lBest=!rBest&&ln>rn;
+ const txInf=(x)=>x?(x.d+' • '+hm(x.ts)):'لا توجد عمليات';
+ const dtInf=(t)=>t?new Date(t).toLocaleString('ar-EG',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+ const bx=(t,n,last,upd,best,less)=>`<div style="background:${best?'rgba(76,212,138,.12)':less?'rgba(255,107,107,.12)':'var(--cd2)'};border:1.5px solid ${best?'rgba(76,212,138,.55)':less?'rgba(255,107,107,.5)':'var(--ln)'};border-radius:16px;padding:12px 14px;margin-bottom:10px;text-align:right">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px">
+   <b style="font-size:16px">${t}</b>
+   <span style="font-size:12px;font-weight:800;padding:3px 9px;border-radius:10px;background:${best?'var(--gr)':less?'var(--rd)':'var(--cd)'};color:${best||less?'#04181a':'var(--mu)'}">${best?'✨ الأحدث (موصى بها)':less?'⚠️ أقدم (عمليات أقل)':'متساوية'}</span>
+  </div>
+  <div style="font-size:15px;font-weight:800;color:${best?'var(--gr)':less?'var(--rd)':'var(--tx)'}">${fmt(n)} عملية مسجلة</div>
+  <div style="font-size:13px;color:var(--mu);margin-top:3px">آخر عملية: <b style="color:var(--tx)">${txInf(last)}</b></div>
+  <div style="font-size:12px;color:var(--mu)">آخر تحديث: ${dtInf(upd)}</div>
+ </div>`;
+ const ov=document.createElement('div');ov.id='gcfo';ov.setAttribute('style','position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px');
+ const done=v=>{ov.remove();res(v)};
+ ov.innerHTML=`<div style="width:100%;max-width:400px;background:var(--cd);border:1.5px solid var(--ln);border-radius:22px;padding:16px;box-shadow:0 12px 36px rgba(0,0,0,.6);max-height:92vh;overflow-y:auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
+   <b style="font-size:17px">☁️ اختلاف بين نسخة الدرايف وهذا الجهاز</b>
+   <span id=gcfc style="width:34px;height:34px;border-radius:10px;background:var(--cd2);display:grid;place-items:center;color:var(--mu);font-size:17px">✕</span>
+  </div>
+  <p style="margin:0 0 12px;font-size:13px;color:var(--mu);line-height:1.6">اختر النسخة التي تريد اعتمادها (النسخة الأخرى ستُحفظ تلقائيًا في النسخ السابقة):</p>
+  ${bx('☁️ نسخة جوجل درايف',rn,rLast,ru,rBest,ln>rn)}
+  ${bx('📱 نسخة هذا الجهاز',ln,lLast,lu,lBest,rn>ln)}
+  <button id=gcfd class=btn style="margin:6px 0 8px;background:var(--gr);color:#04180d">⬇️ تحميل نسخة الدرايف (${fmt(rn)} عملية)</button>
+  <button id=gcfu class="btn d" style="margin:0 0 8px;border:1.5px solid rgba(255,107,107,.5)">⬆️ رفع نسخة هذا الجهاز (${fmt(ln)} عملية)</button>
+  <button id=gcfx class="btn g" style="margin:0;color:var(--mu)">✕ إغلاق الآن بدون أي تغيير</button>
+ </div>`;
+ document.body.appendChild(ov);
+ $('gcfc').onclick=()=>done('cancel');
+ $('gcfx').onclick=()=>done('cancel');
+ $('gcfd').onclick=()=>done('down');
+ $('gcfu').onclick=()=>{if(ln<rn&&!confirm('⚠️ تنبيه: نسخة هذا الجهاز ('+ln+' عملية) أقل من نسخة الدرايف ('+rn+' عملية). هل أنت متأكد من رفعها مكان الدرايف؟'))return;done('up')};
+})}
+async function syncCore(api){const files=await api.list(),main=files.find(f=>f.name=='ledger.json'),lu=S.upd||0,ls=GD.cfg.synced||0;
  if(!main){await gPush(api,files,null);return'up'}
  const ru=gUpd(main);if(ru==lu){GD.cfg.synced=lu;gsave();return'same'}
  const changed=lu>ls;
- if(ru>ls&&changed){try{const rb=JSON.parse(await api.get(main.id)),f=(k,v)=>(k=='upd'||k=='hide')?undefined:v;if(JSON.stringify(rb,f)===JSON.stringify(S,f)){GD.cfg.synced=Math.max(ru,lu);gsave();return'same'}}catch(e){}const useRemote=ask(new Date(ru).toLocaleString('ar-EG'),new Date(lu).toLocaleString('ar-EG'));if(useRemote){await gPull(api,main);return'down'}await gPush(api,files,main);return'up'}
+ if(ru>ls&&changed){
+  let rb=null,rbTxt='';
+  try{rbTxt=await api.get(main.id);rb=JSON.parse(rbTxt);if(JSON.stringify(rb,_sFilt)===JSON.stringify(S,_sFilt)){GD.cfg.synced=Math.max(ru,lu);gsave();return'same'}}catch(e){}
+  if(!rb||!rb.acc){await gPush(api,files,main);return'up'}
+  if(gIsSup(rb,S)){await gPull(api,main,rb);return'down'}
+  if(gIsSup(S,rb)){await gPush(api,files,main,rbTxt);return'up'}
+  const ch=await gConflictUI(rb,ru,lu);
+  if(ch=='down'){await gPull(api,main,rb);return'down'}
+  if(ch=='up'){await gPush(api,files,main,rbTxt);return'up'}
+  return'cancel';
+ }
  if(ru>ls){await gPull(api,main);return'down'}
  if(changed){await gPush(api,files,main);return'up'}
  return'same'}
-const gAsk=(r,l)=>confirm('⚠️ نسخة جوجل درايف مختلفة عن نسخة هذا الجهاز.\n\nالدرايف: '+r+'\nهذا الجهاز: '+l+'\n\nموافق = استخدام نسخة الدرايف (تعديلات هذا الجهاز غير المرفوعة هتضيع، وفيه نسخة احتياطية محلية).\nإلغاء = رفع نسخة هذا الجهاز مكان الدرايف.');
 async function gSync(manual){if(!GD.cfg.cid||!GD.cfg.conn||GD.busy)return;if(!navigator.onLine){gSet('err');return}GD.busy=1;gSet('sync');
- try{await gTok(manual);const r=await syncCore(API,gAsk);GD.cfg.last=Date.now();gsave();gSet('ok');if(manual)toast(r=='up'?'✓ تم رفع النسخة':r=='down'?'✓ تم تحميل نسخة الدرايف':'✓ كل شيء متزامن')}
+ try{await gTok(manual);const r=await syncCore(API);if(r=='cancel'){gSet('auth');if(manual)toast('تم الإغلاق بدون أي تغيير');return}GD.cfg.last=Date.now();gsave();gSet('ok');if(manual)toast(r=='up'?'✓ تم رفع النسخة':r=='down'?'✓ تم تحميل نسخة الدرايف':'✓ كل شيء متزامن')}
  catch(e){const m=String(e&&e.message||e);if(m=='auth'){gSet('auth');gArm()}else if(/popup/.test(m)){gSet('auth');GD.noArm=Date.now()+180000;if(!GD.fromTap&&manual)toast('اسمح بالنوافذ المنبثقة للموقع ثم اضغط ☁️ تاني')}else{gSet('err');if(manual&&!GD.fromTap)toast('تعذرت المزامنة: '+m.slice(0,60))}}finally{GD.busy=0;GD.fromTap=0}}
 function gArm(){if(GD.armed||Date.now()<(GD.noArm||0))return;GD.armed=1;document.addEventListener('click',()=>{GD.armed=0;GD.fromTap=1;gSync(true)},{once:true,capture:true})}
 function cloudDirty(){if(!GD.cfg.conn)return;clearTimeout(GD.t);GD.t=setTimeout(()=>gSync(false),4000)}
@@ -1945,7 +1994,7 @@ async function gVers(){try{await gTok(true);const all=await API.list(),main=all.
 function gRestore(id){askPin(async()=>{if(!confirm('استعادة هذه النسخة مكان البيانات الحالية؟ (هتتحفظ نسخة محلية قبلها)'))return;try{await gTok(true);const d=JSON.parse(await API.get(id));gApplyData(d)}catch(e){toast('تعذرت الاستعادة: '+(e.message||e).toString().slice(0,60))}})}
 function gRestoreRev(fid,rid){askPin(async()=>{if(!confirm('استعادة هذا التعديل من سجل جوجل درايف مكان البيانات الحالية؟'))return;try{await gTok(true);const d=JSON.parse(await API.getRev(fid,rid));gApplyData(d)}catch(e){toast('تعذرت الاستعادة: '+(e.message||e).toString().slice(0,60))}})}
 function cloudUI(){const ok=location.protocol=='https:'||location.hostname=='localhost',c=GD.cfg,st={off:'غير متصل',ok:'متزامن ✓',sync:'جاري المزامنة...',auth:'محتاج تأكيد (اضغط أي مكان)',err:'تعذرت المزامنة / لا يوجد نت'}[GST];
- sheet('☁️ جوجل درايف · إصدار 7',(ok?'':'<div class=alert>⚠️ تسجيل الدخول بجوجل لا يعمل إلا لو التطبيق مفتوح من رابط https (بعد رفعه على الاستضافة). الآن مفتوح كملف.</div>')+
+ sheet('☁️ جوجل درايف · إصدار 8',(ok?'':'<div class=alert>⚠️ تسجيل الدخول بجوجل لا يعمل إلا لو التطبيق مفتوح من رابط https (بعد رفعه على الاستضافة). الآن مفتوح كملف.</div>')+
  locBkHtml()+
  `<p style="color:var(--mu);font-size:13px">بيحفظ نسخة تلقائيًا بعد كل تعديل في مجلد مخفي خاص بالتطبيق على درايفك، وبيحتفظ بآخر 5 نسخ.</p>
  <label>Google Client ID</label><input id=gcid value="${c.cid||''}" placeholder="xxxx.apps.googleusercontent.com" style="direction:ltr">
