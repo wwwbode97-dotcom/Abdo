@@ -1979,22 +1979,51 @@ function cloudDirty(){if(!GD.cfg.conn)return;clearTimeout(GD.t);GD.t=setTimeout(
 async function gConnect(){const v=($('gcid')||{}).value;if(v)GD.cfg.cid=v.trim();if(!GD.cfg.cid)return toast('اكتب الـ Client ID أولًا');gsave();
  try{await gTok(true,'select_account');GD.cfg.conn=1;gsave();closeSh();await gSync(true)}catch(e){toast('تعذر تسجيل الدخول: '+(e.message||e).toString().slice(0,60))}}
 function gDisc(){if(!confirm('إلغاء الربط؟ البيانات المحلية والنسخ على الدرايف تفضل زي ما هي.'))return;try{if(GD.tok&&window.google)google.accounts.oauth2.revoke(GD.tok)}catch(e){}GD.tok=null;GD.cfg.conn=0;gsave();gSet('off');closeSh();toast('تم إلغاء الربط');gateShow()}
-function locBkInfo(k){try{const raw=localStorage.getItem(k);if(!raw)return null;const d=JSON.parse(raw);if(!d||!d.acc)return null;const tx=d.tx||[],last=tx[0];return{k,n:tx.length,upd:d.upd?new Date(d.upd).toLocaleString('ar-EG'):'—',last:last?(last.d+' '+hm(last.ts)+' ('+fmt(last.a||last.b||0)+' ج)'):'لا توجد عمليات'}}catch(e){return null}}
+function locBkInfo(k){try{const raw=localStorage.getItem(k);if(!raw)return null;const d=JSON.parse(raw);if(!d||!d.acc)return null;const tx=d.tx||[],last=tx[0];return{k,n:tx.length,upd:d.upd?new Date(d.upd).toLocaleString('ar-EG',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—',last:last?(last.d+' • '+hm(last.ts)+' ('+fmt(last.a||last.b||0)+' ج)'):'لا توجد عمليات'}}catch(e){return null}}
 function locBkHtml(){const L=['db_prev','db_rescue'].map(locBkInfo).filter(Boolean),seen=new Set(),U=L.filter(x=>{const sig=x.n+'|'+x.last;if(seen.has(sig))return false;seen.add(sig);return true});
  if(!U.length)return '';
- return `<div style="background:rgba(76,212,138,.12);border:1.5px solid rgba(76,212,138,.5);border-radius:16px;padding:12px;margin:10px 0"><b style="color:var(--gr);display:block;margin-bottom:6px">📱 نسخة محفوظة داخل هذا الجهاز (قبل آخر سحب من الدرايف)</b>`+U.map(x=>`<div class=tx style="margin-bottom:6px"><div class=r1><b>${x.n} عملية مسجلة</b><small>${x.upd}</small></div><small style="display:block;margin-top:3px">آخر عملية: <b>${x.last}</b></small><div class=acts style="margin-top:6px"><small style="color:var(--gr);font-weight:800" onclick="gRestoreLoc('${x.k}')">♻️ استعادة هذه النسخة الآن</small><small style="color:var(--p)" onclick="gDlLoc('${x.k}')">💾 تنزيل كملف</small></div></div>`).join('')+`</div>`}
+ return U.map(x=>`<div style="background:rgba(76,212,138,.11);border:1.5px solid rgba(76,212,138,.55);border-radius:16px;padding:13px 14px;margin:8px 0 12px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px">
+   <b style="font-size:15.5px;color:#fff">📱 نسخة محفوظة على هذا الجهاز</b>
+   <span style="font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:10px;background:var(--gr);color:#04180d;white-space:nowrap">✨ قبل آخر سحب</span>
+  </div>
+  <div style="font-size:16px;font-weight:800;color:var(--gr)">${fmt(x.n)} عملية مسجلة</div>
+  <div style="font-size:13px;color:var(--mu);margin-top:3px">آخر عملية: <b style="color:var(--tx)">${x.last}</b></div>
+  <div style="font-size:12px;color:var(--mu)">تاريخ الحفظ: ${x.upd}</div>
+  <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px">
+   <button class=btn style="margin:0;padding:10px 12px;background:var(--gr);color:#04180d;font-size:14.5px;white-space:nowrap" onclick="gRestoreLoc('${x.k}')">♻️ استعادة هذه النسخة</button>
+   <button class="btn g" style="margin:0;padding:10px 14px;border:1px solid var(--ln);font-size:14px;white-space:nowrap" onclick="gDlLoc('${x.k}')">💾 تنزيل</button>
+  </div>
+ </div>`).join('')}
 function gApplyData(d){if(!d||!d.acc)throw new Error('ملف غير صالح');try{localStorage.setItem('db_before_restore',JSON.stringify(S))}catch(e){}S=d;S.set=Object.assign({cr:1.5,cs:1,ci:1},S.set||{});LASTJ='';save();S.upd=Date.now();save();render();closeSh();toast('✓ تمت الاستعادة بنجاح — جاري رفعها للدرايف');gSync(true)}
 function gRestoreLoc(k){askPin(()=>{if(!confirm('استعادة النسخة المحفوظة على هذا الجهاز واعتمادها كأحدث نسخة ورفعها لجوجل درايف؟'))return;try{const d=JSON.parse(localStorage.getItem(k)||'null');gApplyData(d)}catch(e){toast('تعذرت الاستعادة: '+(e.message||e))}})}
 function gDlLoc(k){try{const data=localStorage.getItem(k);if(!data)return toast('غير موجودة');const u=URL.createObjectURL(new Blob([data],{type:'application/json'})),l=document.createElement('a');l.href=u;l.download='local-backup-'+k+'-'+ymd()+'.json';l.click();toast('✓ تم تنزيل الملف')}catch(e){toast('تعذر التنزيل')}}
 async function gInspect(fid,rid,elId){const el=$(elId);if(el)el.textContent='⏳ جاري الفحص...';try{await gTok(true);const txt=rid?await API.getRev(fid,rid):await API.get(fid),d=JSON.parse(txt),tx=d.tx||[],last=tx[0];if(el)el.innerHTML=`<b style="color:var(--gr)">${tx.length} عملية</b>`+(last?` • آخر عملية: ${last.d} ${hm(last.ts)} (${fmt(last.a||last.b||0)} ج)`:'')}catch(e){if(el)el.textContent='تعذر الفحص'}}
 async function gVers(){try{await gTok(true);const all=await API.list(),main=all.find(x=>x.name=='ledger.json'),f=all.filter(x=>x.name.startsWith('v-')||x.name=='ledger.json');
  let revs=[];if(main){try{revs=await API.revs(main.id)}catch(e){}}
- const revTop=revs.slice(0,50),revH=main&&revTop.length?`<b style="display:block;margin:12px 0 6px;color:var(--p)">☁️ أحدث تعديلات ملف الدرايف الداخلي (أحدث ${revTop.length} من إجمالي ${revs.length})</b><small style="display:block;color:var(--mu);margin-bottom:6px">مرتبة من الأحدث (اليوم) للأقدم — اضغط «👁️ فحص العمليات» لمعرفة عدد العمليات وآخر عملية في كل نسخة قبل استعادتها:</small>`+revTop.map((r,i)=>`<div class=tx><div class=r1><span>تعديل #${revs.length-i}${i==0?' (الحالي على الدرايف)':''}</span><small>${new Date(r.modifiedTime).toLocaleString('ar-EG')}</small></div><small id=gin_r_${i} style="display:block;color:var(--mu)">الحجم: ${r.size?(r.size/1024).toFixed(1)+' ك.ب':'—'}</small><div class=acts><small style="color:var(--tx)" onclick="gInspect('${main.id}','${r.id}','gin_r_${i}')">👁️ فحص العمليات</small><small style="color:var(--p)" onclick="gRestoreRev('${main.id}','${r.id}')">♻️ استعادة</small></div></div>`).join(''):'';
- sheet('🕘 النسخ والاستعادة',locBkHtml()+revH+`<b style="display:block;margin:12px 0 6px">🗂 النسخ الدورية (${f.length})</b>`+(f.map((x,i)=>`<div class=tx><div class=r1><span>${x.name=='ledger.json'?'النسخة الحالية':'نسخة '+x.name.slice(2,-5)}</span><small>${new Date(x.modifiedTime).toLocaleString('ar-EG')}</small></div><small id=gin_f_${i} style="display:block;color:var(--mu)">${x.size?'الحجم: '+Math.round(x.size/1024)+' ك.ب':''}</small><div class=acts><small style="color:var(--tx)" onclick="gInspect('${x.id}','','gin_f_${i}')">👁️ فحص العمليات</small><small style="color:var(--p)" onclick="gRestore('${x.id}')">♻️ استعادة</small></div></div>`).join('')||'<div class=empty>لا توجد نسخ</div>'))}catch(e){sheet('🕘 النسخ والاستعادة',locBkHtml()+'<div class=alert>تعذر الاتصال بالدرايف: '+esc((e.message||e).toString().slice(0,60))+'</div>')}}
+ const dtF=t=>t?new Date(t).toLocaleString('ar-EG',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+ const vCard=(ttl,bdg,best,dt,sz,idAttr,onInsp,onRest)=>`<div style="background:${best?'rgba(43,181,189,.10)':'var(--cd2)'};border:1.5px solid ${best?'rgba(43,181,189,.55)':'var(--ln)'};border-radius:16px;padding:12px 14px;margin-bottom:10px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px">
+   <b style="font-size:15px;color:#fff">${ttl}</b>
+   ${bdg?`<span style="font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:10px;background:${best?'var(--p)':'var(--cd)'};color:${best?'#04181a':'var(--mu)'};white-space:nowrap">${bdg}</span>`:''}
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--mu)">
+   <span>${dt}</span>
+   <span>${sz}</span>
+  </div>
+  <div id=${idAttr} style="font-size:13px;color:var(--mu);margin-top:4px"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+   <button class="btn g" style="margin:0;padding:9px 8px;border:1px solid var(--ln);font-size:13.5px;color:var(--tx);white-space:nowrap" onclick="${onInsp}">👁️ فحص العمليات</button>
+   <button class=btn style="margin:0;padding:9px 8px;background:${best?'var(--p)':'#183538'};color:${best?'#04181a':'var(--p)'};border:1px solid rgba(43,181,189,.35);font-size:13.5px;white-space:nowrap" onclick="${onRest}">♻️ استعادة</button>
+  </div>
+ </div>`;
+ const revTop=revs.slice(0,50),revH=main&&revTop.length?`<div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px"><b style="color:var(--p);font-size:15px">☁️ تعديلات الدرايف الداخلية</b><small style="color:var(--mu)">أحدث ${revTop.length} من ${revs.length}</small></div>`+revTop.map((r,i)=>vCard('تعديل #'+(revs.length-i),i==0?'✨ الحالي على الدرايف':'',i==0,dtF(r.modifiedTime),r.size?(r.size/1024).toFixed(1)+' ك.ب':'—','gin_r_'+i,`gInspect('${main.id}','${r.id}','gin_r_${i}')`,`gRestoreRev('${main.id}','${r.id}')`)).join(''):'';
+ const perH=`<div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px"><b style="font-size:15px">🗂 النسخ الدورية المحفوظة</b><small style="color:var(--mu)">${f.length} نسخة</small></div>`+(f.map((x,i)=>vCard(x.name=='ledger.json'?'النسخة الرئيسية (ledger)':x.name.replace(/^v-/,'').replace(/\.json$/,''),x.name=='ledger.json'?'الأساسية':'',x.name=='ledger.json',dtF(x.modifiedTime),x.size?(x.size/1024).toFixed(1)+' ك.ب':'—','gin_f_'+i,`gInspect('${x.id}','','gin_f_${i}')`,`gRestore('${x.id}')`)).join('')||'<div class=empty>لا توجد نسخ</div>');
+ sheet('🕘 النسخ والاستعادة',locBkHtml()+revH+perH)}catch(e){sheet('🕘 النسخ والاستعادة',locBkHtml()+'<div class=alert>تعذر الاتصال بالدرايف: '+esc((e.message||e).toString().slice(0,60))+'</div>')}}
 function gRestore(id){askPin(async()=>{if(!confirm('استعادة هذه النسخة مكان البيانات الحالية؟ (هتتحفظ نسخة محلية قبلها)'))return;try{await gTok(true);const d=JSON.parse(await API.get(id));gApplyData(d)}catch(e){toast('تعذرت الاستعادة: '+(e.message||e).toString().slice(0,60))}})}
 function gRestoreRev(fid,rid){askPin(async()=>{if(!confirm('استعادة هذا التعديل من سجل جوجل درايف مكان البيانات الحالية؟'))return;try{await gTok(true);const d=JSON.parse(await API.getRev(fid,rid));gApplyData(d)}catch(e){toast('تعذرت الاستعادة: '+(e.message||e).toString().slice(0,60))}})}
 function cloudUI(){const ok=location.protocol=='https:'||location.hostname=='localhost',c=GD.cfg,st={off:'غير متصل',ok:'متزامن ✓',sync:'جاري المزامنة...',auth:'محتاج تأكيد (اضغط أي مكان)',err:'تعذرت المزامنة / لا يوجد نت'}[GST];
- sheet('☁️ جوجل درايف · إصدار 8',(ok?'':'<div class=alert>⚠️ تسجيل الدخول بجوجل لا يعمل إلا لو التطبيق مفتوح من رابط https (بعد رفعه على الاستضافة). الآن مفتوح كملف.</div>')+
+ sheet('☁️ جوجل درايف · إصدار 9',(ok?'':'<div class=alert>⚠️ تسجيل الدخول بجوجل لا يعمل إلا لو التطبيق مفتوح من رابط https (بعد رفعه على الاستضافة). الآن مفتوح كملف.</div>')+
  locBkHtml()+
  `<p style="color:var(--mu);font-size:13px">بيحفظ نسخة تلقائيًا بعد كل تعديل في مجلد مخفي خاص بالتطبيق على درايفك، وبيحتفظ بآخر 5 نسخ.</p>
  <label>Google Client ID</label><input id=gcid value="${c.cid||''}" placeholder="xxxx.apps.googleusercontent.com" style="direction:ltr">
